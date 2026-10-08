@@ -1,0 +1,14 @@
+name: Keep Supabase Alive
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping health endpoint
+        run: |
+          curl -f -s "${{ vars.SITE_URL }}/api/health" || echo "Health check failed"

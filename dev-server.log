@@ -1,0 +1,269 @@
+
+> bioliz-global-sport@0.1.0 dev
+> next dev
+
+▲ Next.js 16.3.8 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://172.15.2.242:3000
+- Environments: .env.local
+✓ Ready in 5.9s
+✓ Running next.config.ts took 329ms
+- Experiments (use with caution):
+  · serverActions
+
+⨯ Error: Event handlers cannot be passed to Client Component props.
+  <button className=... aria-label=... onClick={function onClick} children=...>
+                                               ^^^^^^^^^^^^^^^^^^
+If you need interactivity, consider converting part of this to a Client Component.
+    at ignore-listed frames {
+  digest: '634688897'
+}
+⨯ Error: Event handlers cannot be passed to Client Component props.
+  <button className=... aria-label=... onClick={function onClick} children=...>
+                                               ^^^^^^^^^^^^^^^^^^
+If you need interactivity, consider converting part of this to a Client Component.
+    at ignore-listed frames {
+  digest: '634688897'
+}
+⨯ Error: Event handlers cannot be passed to Client Component props.
+  <button className=... aria-label=... onClick={function onClick} children=...>
+                                               ^^^^^^^^^^^^^^^^^^
+If you need interactivity, consider converting part of this to a Client Component.
+    at ignore-listed frames {
+  digest: '634688897'
+}
+⨯ Error: Event handlers cannot be passed to Client Component props.
+  <button className=... aria-label=... onClick={function onClick} children=...>
+                                               ^^^^^^^^^^^^^^^^^^
+If you need interactivity, consider converting part of this to a Client Component.
+    at ignore-listed frames {
+  digest: '634688897'
+}
+⨯ Error: Event handlers cannot be passed to Client Component props.
+  <button className=... aria-label=... onClick={function onClick} children=...>
+                                               ^^^^^^^^^^^^^^^^^^
+If you need interactivity, consider converting part of this to a Client Component.
+    at ignore-listed frames {
+  digest: '1832902279'
+}
+⨯ Error: Event handlers cannot be passed to Client Component props.
+  <button className=... aria-label=... onClick={function onClick} children=...>
+                                               ^^^^^^^^^^^^^^^^^^
+If you need interactivity, consider converting part of this to a Client Component.
+    at ignore-listed frames {
+  digest: '1832902279'
+}
+ GET / 500 in 3.6s (next.js: 2.4s, application-code: 1163ms)
+ GET / 200 in 505ms (next.js: 160ms, application-code: 345ms)
+ GET /shop 200 in 746ms (next.js: 346ms, application-code: 400ms)
+ GET /product/olympic-barbell-20kg 200 in 6.2s (next.js: 5.9s, application-code: 265ms)
+ GET /category/gym-fitness-equipment 200 in 2.6s (next.js: 2.4s, application-code: 206ms)
+ GET /admin/login 200 in 512ms (next.js: 375ms, application-code: 137ms)
+ GET / 200 in 500ms (next.js: 98ms, application-code: 403ms)
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Spin+Bike" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Table+Tennis" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Arcade+Basketball" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Adjustable+Dumbbell" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Snooker+Table" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Olympic+Barbell" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+ GET /shop 200 in 217ms (next.js: 32ms, application-code: 185ms)
+[browser] Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Spin+Bike" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Snooker+Table" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Olympic+Barbell" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Treadmill" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=8ft+Snooker+Table" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Adjustable+Dumbbell" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Table+Tennis" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Football+Set" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Arcade+Basketball" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+ GET / 200 in 145ms (next.js: 20ms, application-code: 125ms)
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Table+Tennis" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Olympic+Barbell" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Arcade+Basketball" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Spin+Bike" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Adjustable+Dumbbell" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Snooker+Table" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Olympic+Barbell" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Adjustable+Dumbbell" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Spin+Bike" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Arcade+Basketball" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Snooker+Table" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Table+Tennis" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Olympic+Barbell" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Adjustable+Dumbbell" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Spin+Bike" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Table+Tennis" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Snooker+Table" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Arcade+Basketball" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Spin+Bike" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Olympic+Barbell" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Table+Tennis" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Snooker+Table" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Adjustable+Dumbbell" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Arcade+Basketball" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+ GET /cart 200 in 584ms (next.js: 448ms, application-code: 136ms)
+ GET /shop 200 in 240ms (next.js: 40ms, application-code: 199ms)
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Adjustable+Dumbbell" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Olympic+Barbell" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Treadmill" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Snooker+Table" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Spin+Bike" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=8ft+Snooker+Table" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Table+Tennis" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Football+Set" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Arcade+Basketball" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Olympic+Barbell" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Adjustable+Dumbbell" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Spin+Bike" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Treadmill" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=8ft+Snooker+Table" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Snooker+Table" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Arcade+Basketball" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Table+Tennis" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Football+Set" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+ GET /admin/login 200 in 143ms (next.js: 43ms, application-code: 99ms)
+ GET /admin 200 in 2.4s (next.js: 1952ms, application-code: 410ms)
+ POST /admin/login 200 in 2.8s (next.js: 39ms, application-code: 2.8s)
+  └─ ƒ login({}) in 314ms src/actions/auth.ts
+ GET /admin/categories 200 in 2.1s (next.js: 1962ms, application-code: 161ms)
+ POST /admin/categories 200 in 438ms (next.js: 60ms, application-code: 378ms)
+  └─ ƒ getCategoriesAdmin() in 32ms src/actions/categories.ts
+ POST /admin/categories 200 in 139ms (next.js: 46ms, application-code: 93ms)
+  └─ ƒ getCategoriesAdmin() in 27ms src/actions/categories.ts
+ GET /admin/products 200 in 1361ms (next.js: 1210ms, application-code: 152ms)
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Olympic+Barbell" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Spin+Bike" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Treadmill" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Adjustable+Dumbbell" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Snooker+Table" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=8ft+Snooker+Table" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Table+Tennis" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Football+Set" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Arcade+Basketball" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+ GET /admin/products/new 200 in 2.1s (next.js: 1968ms, application-code: 111ms)
+ GET /admin/settings 200 in 2.9s (next.js: 2.6s, application-code: 306ms)
+ GET / 200 in 713ms (next.js: 72ms, application-code: 642ms)
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Olympic+Barbell" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Adjustable+Dumbbell" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Spin+Bike" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Arcade+Basketball" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Snooker+Table" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Table+Tennis" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+ GET /quote 200 in 572ms (next.js: 498ms, application-code: 74ms)
+[browser] Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Spin+Bike" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Olympic+Barbell" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Adjustable+Dumbbell" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Snooker+Table" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Table+Tennis" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Arcade+Basketball" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+✓ Compiled in 4.3s
+○ Compiling middleware ...
+⚠ Fast Refresh had to perform a full reload when ./node_modules/next/dist/client/image-component.js changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET / 200 in 1087ms (next.js: 15ms, application-code: 1072ms)
+ GET / 200 in 111ms (next.js: 17ms, application-code: 93ms)
+⨯ Error: The destination stream closed early.
+    at ignore-listed frames {
+  digest: '603463568'
+}
+ GET / 200 in 437ms (next.js: 17ms, application-code: 420ms)
+ GET / 200 in 2.2s (next.js: 827ms, application-code: 1371ms)
+ GET / 200 in 1116ms (next.js: 80ms, application-code: 1036ms)
+ GET / 200 in 133ms (next.js: 47ms, application-code: 86ms)
+ GET / 200 in 153ms (next.js: 35ms, application-code: 118ms)
+ GET / 200 in 79ms (next.js: 10ms, application-code: 69ms)
+ GET / 200 in 119ms (next.js: 12ms, application-code: 107ms)
+✓ Compiled in 521ms
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Table+Tennis" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Spin+Bike" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Arcade+Basketball" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Adjustable+Dumbbell" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Snooker+Table" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Olympic+Barbell" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+ GET / 200 in 310ms (next.js: 35ms, application-code: 275ms)
+ GET /shop 200 in 690ms (next.js: 267ms, application-code: 424ms)
+ GET /product/olympic-barbell-20kg 200 in 656ms (next.js: 310ms, application-code: 346ms)
+ GET /category/gym-fitness-equipment 200 in 591ms (next.js: 270ms, application-code: 320ms)
+ GET /admin/login 200 in 540ms (next.js: 343ms, application-code: 197ms)
+ GET / 200 in 195ms (next.js: 44ms, application-code: 150ms)
+ GET / 200 in 81ms (next.js: 12ms, application-code: 70ms)
+ GET / 200 in 101ms (next.js: 38ms, application-code: 63ms)
+ GET / 200 in 131ms (next.js: 15ms, application-code: 117ms)
+ GET / 200 in 106ms (next.js: 12ms, application-code: 94ms)
+ GET / 200 in 78ms (next.js: 10ms, application-code: 68ms)
+ GET / 200 in 66ms (next.js: 9ms, application-code: 57ms)
+ GET / 200 in 77ms (next.js: 11ms, application-code: 66ms)
+ GET / 200 in 462ms (next.js: 29ms, application-code: 433ms)
+ GET /shop 200 in 448ms (next.js: 84ms, application-code: 364ms)
+ GET /category/gym-fitness-equipment 200 in 428ms (next.js: 125ms, application-code: 303ms)
+ GET /product/olympic-barbell-20kg 200 in 449ms (next.js: 187ms, application-code: 262ms)
+ GET /cart 200 in 338ms (next.js: 172ms, application-code: 165ms)
+ GET /checkout 200 in 830ms (next.js: 634ms, application-code: 196ms)
+ GET /quote 200 in 401ms (next.js: 214ms, application-code: 187ms)
+ GET /about 200 in 1033ms (next.js: 926ms, application-code: 107ms)
+ GET /contact 200 in 763ms (next.js: 670ms, application-code: 93ms)
+ GET /order-sent/TEST-123 200 in 3.4s (next.js: 3.3s, application-code: 81ms)
+ GET /sitemap.xml 200 in 931ms (next.js: 724ms, application-code: 208ms)
+ GET /robots.txt 200 in 377ms (next.js: 328ms, application-code: 49ms)
+ GET /quote 200 in 105ms (next.js: 27ms, application-code: 78ms)
+ GET /checkout 200 in 80ms (next.js: 14ms, application-code: 66ms)
+ GET /cart 200 in 65ms (next.js: 11ms, application-code: 54ms)
+ GET /order-sent/TEST-123 200 in 137ms (next.js: 63ms, application-code: 73ms)
+ GET / 200 in 438ms (next.js: 63ms, application-code: 375ms)
+ GET /product/olympic-barbell-20kg 200 in 396ms (next.js: 100ms, application-code: 296ms)
+ GET / 200 in 177ms (next.js: 9ms, application-code: 168ms)
+ GET /product/olympic-barbell-20kg 200 in 251ms (next.js: 60ms, application-code: 191ms)
+ GET /product/olympic-barbell-20kg 200 in 430ms (next.js: 90ms, application-code: 340ms)
+ GET /product/olympic-barbell-20kg 200 in 566ms (next.js: 130ms, application-code: 436ms)
+ GET / 200 in 144ms (next.js: 59ms, application-code: 85ms)
+ GET / 200 in 324ms (next.js: 36ms, application-code: 288ms)
+ GET /product/olympic-barbell-20kg 200 in 412ms (next.js: 103ms, application-code: 310ms)
+[browser] ./src/app/(store)/category/[slug]/page.tsx:55:1
+Error: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  53 |     </div>
+  54 |   );
+> 55 | }
+     | ^
+  56 |
+
+Parsing ecmascript source code failed 
+[browser] ./src/app/(store)/shop/page.tsx:96:1
+Error: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  94 |     </div>
+  95 |   );
+> 96 | }
+     | ^
+  97 |
+
+Parsing ecmascript source code failed 
+ GET / 200 in 985ms (next.js: 90ms, application-code: 894ms)
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Olympic+Barbell" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Adjustable+Dumbbell" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Spin+Bike" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+ GET / 200 in 499ms (next.js: 26ms, application-code: 473ms)
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Olympic+Barbell" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Adjustable+Dumbbell" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Spin+Bike" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+ GET / 200 in 837ms (next.js: 106ms, application-code: 731ms)
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Spin+Bike" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Adjustable+Dumbbell" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Olympic+Barbell" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+ GET / 200 in 727ms (next.js: 30ms, application-code: 697ms)
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Olympic+Barbell" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Adjustable+Dumbbell" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Spin+Bike" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+ GET / 200 in 462ms (next.js: 17ms, application-code: 445ms)
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Spin+Bike" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Olympic+Barbell" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Adjustable+Dumbbell" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+ GET / 200 in 510ms (next.js: 15ms, application-code: 495ms)
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Spin+Bike" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Olympic+Barbell" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+⨯ The requested resource "https://placehold.co/600x400/1a1a1a/ff5a1f?text=Adjustable+Dumbbell" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+getCategories error: TypeError: fetch failed
+getFeaturedProducts error: TypeError: fetch failed
+ GET / 200 in 7.9s (next.js: 46ms, application-code: 7.8s)
+getCategories error: TypeError: fetch failed
+getFeaturedProducts error: TypeError: fetch failed
+ GET / 200 in 7.5s (next.js: 15ms, application-code: 7.5s)

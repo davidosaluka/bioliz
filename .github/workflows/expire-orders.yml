@@ -1,0 +1,15 @@
+name: Expire Unpaid Orders
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+jobs:
+  expire:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call expire-orders endpoint
+        run: |
+          curl -f -s "${{ vars.SITE_URL }}/api/cron/expire-orders" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" || echo "Expire job failed"

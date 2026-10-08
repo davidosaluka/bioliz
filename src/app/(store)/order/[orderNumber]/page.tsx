@@ -1,0 +1,90 @@
+import { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { verifyPaystackPayment } from "@/lib/paystack";
+import { sendOrderEmails } from "@/lib/email";
+import { createMetadata } from "@/lib/metadata";
+import { OrderConfirmationClient } from "@/components/store/order-confirmation-client";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ orderNumber: string }>;
+}): Promise<Metadata> {
+  const { orderNumber } = await params;
+  return createMetadata({
+    title: `Order ${orderNumber}`,
+    description: "View your order status and receipt from Bioliz Global Sport.",
+    path: `/order/${orderNumber}`,
+  });
+}
+
+export default async function OrderPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ orderNumber: string }>;
+  searchParams: Promise<{ token?: string }>;
+}) {
+  const { orderNumber } = await params;
+  const { token } = await searchParams;
+
+  if (!token) {
+    notFound();
+  }
+
+  const admin = createAdminClient();
+  const { data: order, error } = await admin
+    .from("orders")
+    .select("*, items:order_items(*), payment:payments(*)")
+    .eq("order_number", orderNumber)
+    .eq("public_token", token)
+    .single();
+
+  if (error || !order) {
+    notFound();
+  }
+
+  // If still pending, verify with Paystack in case the customer returned before
+  // the webhook arrived.
+  const payment = order.payment?.[0];
+  const canVerify =
+    order.status === "pending_payment" ||
+    (order.status === "expired" && order.payment_status !== "paid");
+  if (canVerify && payment?.reference) {
+    try {
+      const verified = await verifyPaystackPayment(payment.reference);
+      const total = order.total ?? 0;
+      if (
+        verified.status &&
+        verified.data?.status === "success" &&
+        verified.data.currency === "NGN" &&
+        verified.data.amount === Math.round(total * 100)
+      ) {
+        await admin.rpc("mark_order_paid", {
+          p_order_id: order.id,
+          p_reference: payment.reference,
+          p_amount: total,
+          p_channel: verified.data.channel ?? null,
+          p_txn_id: String(verified.data.id),
+          p_raw: verified.data as never,
+        });
+
+        sendOrderEmails(order.id).catch((err) => {
+          console.error("OrderPage sendOrderEmails error:", err);
+        });
+      }
+    } catch (err) {
+      console.error("OrderPage verify error:", err);
+    }
+  }
+
+  // Re-fetch to include any changes from the verify step.
+  const { data: refreshedOrder } = await admin
+    .from("orders")
+    .select("*, items:order_items(*), payment:payments(*)")
+    .eq("id", order.id)
+    .single();
+
+  return <OrderConfirmationClient order={refreshedOrder ?? order} />;
+}

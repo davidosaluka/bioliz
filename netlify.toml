@@ -1,0 +1,12 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[template.environment]
+  NEXT_PUBLIC_SUPABASE_URL = "Add your Supabase URL"
+  NEXT_PUBLIC_SUPABASE_ANON_KEY = "Add your Supabase anon key"
+  SUPABASE_SERVICE_ROLE_KEY = "Add your Supabase service role key"
+  NEXT_PUBLIC_SITE_URL = "Add your public site URL"
