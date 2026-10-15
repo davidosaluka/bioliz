@@ -26,15 +26,27 @@ export async function verifyPaystackPayment(
     throw new Error("PAYSTACK_SECRET_KEY is not configured");
   }
 
-  const res = await fetch(`${PAYSTACK_BASE}/transaction/verify/${reference}`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${secretKey}`,
-      "Content-Type": "application/json",
-    },
-    // Avoid Next.js fetch cache for payment verification.
-    cache: "no-store",
-  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10_000);
 
-  return (await res.json()) as PaystackVerifyResponse;
+  try {
+    const res = await fetch(`${PAYSTACK_BASE}/transaction/verify/${reference}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${secretKey}`,
+        "Content-Type": "application/json",
+      },
+      // Avoid Next.js fetch cache for payment verification.
+      cache: "no-store",
+      signal: controller.signal,
+    });
+
+    if (!res.ok) {
+      throw new Error(`Paystack verify returned ${res.status}`);
+    }
+
+    return (await res.json()) as PaystackVerifyResponse;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }

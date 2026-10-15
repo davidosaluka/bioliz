@@ -60,10 +60,11 @@ export default function AboutPage() {
           How to order
         </h2>
         <p>
-          Browse our catalogue, add items to your cart and checkout. Your order is
-          sent to us on WhatsApp where we confirm pricing, availability and
-          delivery. No online payment is taken — everything is agreed directly
-          with you.
+          Browse our catalogue, add items to your cart and proceed to checkout.
+          You will pay securely online with Paystack by card or bank transfer.
+          Once payment is confirmed, we process your order and contact you on
+          WhatsApp to confirm delivery details, timing and any special
+          arrangements.
         </p>
 
         <p>

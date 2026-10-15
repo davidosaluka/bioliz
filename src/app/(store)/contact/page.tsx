@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { createMetadata } from "@/lib/metadata";
 import { BreadcrumbJsonLd } from "@/components/store/json-ld";
-import { Phone, Mail, MapPin, MessageCircle } from "lucide-react";
+import { Mail, MapPin, MessageCircle } from "lucide-react";
 
 export const metadata: Metadata = createMetadata({
   title: "Contact Bioliz Global Sport",

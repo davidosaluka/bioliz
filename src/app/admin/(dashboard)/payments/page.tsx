@@ -5,7 +5,6 @@ import Link from "next/link";
 import { getPaymentsAdmin } from "@/actions/payments-admin";
 import { formatCurrency } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,

@@ -229,6 +229,7 @@ export function CartPageClient() {
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8"
+                        aria-label="Decrease quantity"
                         onClick={() =>
                           updateQuantity(
                             item.productId,
@@ -240,13 +241,14 @@ export function CartPageClient() {
                       >
                         <Minus className="h-3 w-3" />
                       </Button>
-                      <span className="w-10 text-center text-sm">
+                      <span className="w-10 text-center text-sm" aria-live="polite">
                         {item.quantity}
                       </span>
                       <Button
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8"
+                        aria-label="Increase quantity"
                         onClick={() =>
                           updateQuantity(
                             item.productId,
@@ -263,6 +265,7 @@ export function CartPageClient() {
                       variant="ghost"
                       size="icon"
                       className="text-destructive"
+                      aria-label="Remove item"
                       onClick={() => removeItem(item.productId, item.variantId)}
                     >
                       <Trash2 className="h-4 w-4" />

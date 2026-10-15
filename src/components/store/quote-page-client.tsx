@@ -114,7 +114,12 @@ export function QuotePageClient() {
               }
             >
               <SelectTrigger id="buyerType">
-                <SelectValue placeholder="Select buyer type" />
+                <SelectValue placeholder="Select buyer type">
+                  {formData.buyerType
+                    ? formData.buyerType.charAt(0).toUpperCase() +
+                      formData.buyerType.slice(1)
+                    : "Select buyer type"}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {buyerTypes.map((type) => (

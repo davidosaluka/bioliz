@@ -1,12 +1,13 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import Image from "next/image";
 import imageCompression from "browser-image-compression";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { X, Upload, GripVertical } from "lucide-react";
+import { X, GripVertical } from "lucide-react";
 import { toast } from "sonner";
 
 export function ImageUploader({
@@ -68,7 +69,7 @@ export function ImageUploader({
         if (uploadedUrls.length > 0) {
           onChange([...images, ...uploadedUrls]);
         }
-      } catch (err) {
+      } catch {
         toast.error("Failed to upload images");
       } finally {
         setUploading(false);
@@ -129,10 +130,12 @@ export function ImageUploader({
               key={`${url}-${index}`}
               className="group relative aspect-square overflow-hidden rounded-lg border border-border/50 bg-muted"
             >
-              <img
+              <Image
                 src={url}
                 alt={`Product image ${index + 1}`}
-                className="h-full w-full object-cover"
+                fill
+                sizes="(max-width: 640px) 50vw, 25vw"
+                className="object-cover"
               />
               <div className="absolute inset-x-0 top-0 flex justify-between p-2 opacity-0 transition-opacity group-hover:opacity-100">
                 <div className="flex gap-1">

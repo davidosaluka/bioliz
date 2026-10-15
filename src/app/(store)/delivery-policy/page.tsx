@@ -46,7 +46,12 @@ export default function DeliveryPolicyPage() {
           third-party installers on request.
         </p>
 
-        <p className="font-semibold text-primary">[CLIENT TO REVIEW]</p>
+        <h2 className="text-xl font-semibold text-white">Contact us</h2>
+        <p>
+          If you have questions about delivery options or need a quote for a
+          location not listed at checkout, please contact us through the details
+          on our website.
+        </p>
       </div>
     </div>
   );

@@ -5,7 +5,7 @@ import crypto from "crypto";
 
 export const dynamic = "force-dynamic";
 
-function verifySignature(rawBody: string, signature: string | null): boolean {
+export function verifySignature(rawBody: string, signature: string | null): boolean {
   if (!signature) return false;
   const secret = process.env.PAYSTACK_SECRET_KEY;
   if (!secret) return false;
@@ -44,11 +44,14 @@ export async function POST(request: Request) {
 
   const event = String(payload.event ?? "unknown");
   const data = (payload.data ?? {}) as Record<string, unknown>;
-  const eventKey = `${event}:${data.id ?? data.reference ?? crypto.randomUUID()}`;
+
+  // Deterministic idempotency key: hash the entire raw body so duplicate
+  // webhooks from Paystack are reliably deduplicated.
+  const eventKey = crypto.createHash("sha256").update(rawBody).digest("hex");
 
   const admin = createAdminClient();
 
-  // Idempotency: ignore duplicate events.
+  // Idempotency: ignore duplicate events, fail loudly on real errors.
   const { error: insertEventError } = await admin
     .from("webhook_events")
     .insert({
@@ -58,9 +61,14 @@ export async function POST(request: Request) {
       payload: payload as never,
     });
 
-  if (insertEventError?.code === "23505") {
-    // Unique violation
-    return new Response("OK", { status: 200 });
+  if (insertEventError) {
+    if (insertEventError.code === "23505") {
+      // Unique violation: already processed.
+      return new Response("OK", { status: 200 });
+    }
+
+    console.error("Webhook: failed to record event", insertEventError);
+    return new Response("Internal server error", { status: 500 });
   }
 
   if (event === "charge.success") {
@@ -135,21 +143,24 @@ export async function POST(request: Request) {
     if (reference) {
       const { data: payment } = await admin
         .from("payments")
-        .select("order_id")
+        .select("order_id, status")
         .eq("reference", reference)
         .single();
 
-      await admin
-        .from("payments")
-        .update({ status: "failed" })
-        .eq("reference", reference);
-
-      if (payment?.order_id) {
+      // Never overwrite a successful payment with a late failed event.
+      if (payment && payment.status !== "success") {
         await admin
-          .from("orders")
-          .update({ payment_status: "failed" })
-          .eq("id", payment.order_id)
-          .eq("payment_status", "pending");
+          .from("payments")
+          .update({ status: "failed" })
+          .eq("reference", reference);
+
+        if (payment.order_id) {
+          await admin
+            .from("orders")
+            .update({ payment_status: "failed" })
+            .eq("id", payment.order_id)
+            .eq("payment_status", "pending");
+        }
       }
     }
   }

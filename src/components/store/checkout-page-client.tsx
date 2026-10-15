@@ -169,7 +169,7 @@ export function CheckoutPageClient() {
   );
 
   const selectedZone = deliveryZones.find((z) => z.id === formData.deliveryZoneId);
-  const deliveryFee = selectedZone?.quote_after_payment ? 0 : (selectedZone?.fee ?? 0);
+  const deliveryFee = selectedZone?.fee ?? 0;
   const total = subtotal + deliveryFee;
 
   async function handleSubmit(e: React.FormEvent) {
@@ -286,25 +286,20 @@ export function CheckoutPageClient() {
               }
             >
               <SelectTrigger id="deliveryZone">
-                <SelectValue placeholder="Choose a delivery zone" />
+                <SelectValue placeholder="Choose a delivery zone">
+                  {selectedZone
+                    ? `${selectedZone.name} — ${formatCurrency(selectedZone.fee ?? 0)}`
+                    : "Choose a delivery zone"}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {deliveryZones.map((zone) => (
                   <SelectItem key={zone.id} value={zone.id}>
-                    {zone.name}
-                    {zone.quote_after_payment
-                      ? " — quoted after payment"
-                      : ` — ${formatCurrency(zone.fee ?? 0)}`}
+                    {zone.name} — {formatCurrency(zone.fee ?? 0)}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            {selectedZone?.quote_after_payment && (
-              <p className="text-xs text-muted-foreground">
-                We will contact you after payment with the delivery cost for your
-                location.
-              </p>
-            )}
           </div>
 
           <div className="space-y-2">
@@ -406,11 +401,7 @@ export function CheckoutPageClient() {
           </div>
           <div className="mt-2 flex justify-between text-sm">
             <span className="text-muted-foreground">Delivery</span>
-            <span className="font-medium text-white">
-              {selectedZone?.quote_after_payment
-                ? "Quoted after payment"
-                : formatCurrency(deliveryFee)}
-            </span>
+            <span className="font-medium text-white">{formatCurrency(deliveryFee)}</span>
           </div>
           <Separator className="my-4" />
           <div className="flex justify-between">

@@ -1,3 +1,9 @@
+function serializeJsonLd(jsonLd: Record<string, unknown>): string {
+  // Escape forward slashes so that `</script>` inside user-controlled data
+  // cannot break out of the script tag.
+  return JSON.stringify(jsonLd).replace(/\//g, "\\/");
+}
+
 export function JsonLd({
   type,
   data,
@@ -15,7 +21,7 @@ export function JsonLd({
     <script
       id={`jsonld-${type}`}
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
     />
   );
 }
@@ -42,7 +48,7 @@ export function BreadcrumbJsonLd({
     <script
       id="jsonld-breadcrumb"
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
     />
   );
 }

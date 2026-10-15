@@ -5,7 +5,7 @@ import { CheckoutPageClient } from "@/components/store/checkout-page-client";
 export const metadata: Metadata = createMetadata({
   title: "Checkout",
   description:
-    "Enter your delivery details and send your order via WhatsApp. No online payment — we confirm pricing, availability and delivery directly with you.",
+    "Enter your delivery details and pay securely online with Paystack. We confirm pricing, availability and delivery across Nigeria.",
   path: "/checkout",
 });
 

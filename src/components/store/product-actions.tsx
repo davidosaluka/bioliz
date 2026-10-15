@@ -8,6 +8,7 @@ import { formatCurrency } from "@/lib/format";
 import { buildProductWhatsAppMessage } from "@/lib/whatsapp";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -29,10 +30,14 @@ export function ProductActions({
 }) {
   const router = useRouter();
   const addItem = useCart((state) => state.addItem);
-  const [variantId, setVariantId] = useState<string>("");
-  const [quantity, setQuantity] = useState(1);
 
   const activeVariants = product.variants?.filter((v) => v.is_active ?? false) ?? [];
+
+  const [variantId, setVariantId] = useState<string>(() => {
+    return activeVariants[0]?.id ?? "";
+  });
+  const [quantity, setQuantity] = useState(1);
+
   const selectedVariant = activeVariants.find((v) => v.id === variantId);
   const effectivePrice = selectedVariant?.price ?? product.price;
   const effectiveStock = selectedVariant
@@ -40,6 +45,8 @@ export function ProductActions({
     : product.stock_quantity;
   const trackStock = product.track_stock ?? false;
   const isOutOfStock = trackStock && effectiveStock <= 0;
+  const isLowStock =
+    trackStock && !isOutOfStock && effectiveStock > 0 && effectiveStock <= 3;
   const isPriceOnRequest = product.price_on_request || effectivePrice === null;
 
   function handleAddToCart() {
@@ -48,7 +55,12 @@ export function ProductActions({
       return;
     }
 
-    const finalVariantId = selectedVariant ? selectedVariant.id : undefined;
+    if (activeVariants.length > 0 && !selectedVariant) {
+      toast.error("Please select a variant");
+      return;
+    }
+
+    const finalVariantId = selectedVariant?.id;
     const maxStock = trackStock ? effectiveStock : Infinity;
 
     if (quantity > maxStock) {
@@ -87,7 +99,20 @@ export function ProductActions({
           <Label htmlFor="variant">Variant</Label>
           <Select value={variantId} onValueChange={(value) => setVariantId(value ?? "")}>
             <SelectTrigger id="variant">
-              <SelectValue placeholder="Choose an option" />
+              <SelectValue placeholder="Choose an option">
+                {selectedVariant ? (
+                  <>
+                    {selectedVariant.label}
+                    {selectedVariant.price !== null && (
+                      <span className="ml-2 text-muted-foreground">
+                        – {formatCurrency(selectedVariant.price)}
+                      </span>
+                    )}
+                  </>
+                ) : (
+                  "Choose an option"
+                )}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               {activeVariants.map((variant) => (
@@ -105,21 +130,30 @@ export function ProductActions({
         </div>
       )}
 
+      {(isOutOfStock || isLowStock) && (
+        <div className="flex flex-wrap gap-2">
+          {isOutOfStock && <Badge variant="secondary">Out of stock</Badge>}
+          {isLowStock && <Badge variant="secondary">Low stock</Badge>}
+        </div>
+      )}
+
       <div className="space-y-2">
         <Label>Quantity</Label>
         <div className="flex w-fit items-center rounded-lg border border-border/50">
           <Button
             variant="ghost"
             size="icon"
+            aria-label="Decrease quantity"
             onClick={() => setQuantity((q) => Math.max(1, q - 1))}
             disabled={quantity <= 1}
           >
             <Minus className="h-4 w-4" />
           </Button>
-          <span className="w-12 text-center text-sm font-medium">{quantity}</span>
+          <span className="w-12 text-center text-sm font-medium" aria-live="polite">{quantity}</span>
           <Button
             variant="ghost"
             size="icon"
+            aria-label="Increase quantity"
             onClick={() => setQuantity((q) => q + 1)}
             disabled={trackStock && quantity >= effectiveStock}
           >
@@ -155,7 +189,7 @@ export function ProductActions({
               size="lg"
               className="flex-1 bg-primary text-primary-foreground hover:bg-brand-dark"
               onClick={handleAddToCart}
-              disabled={isOutOfStock}
+              disabled={isOutOfStock || (activeVariants.length > 0 && !selectedVariant)}
             >
               <ShoppingCart className="mr-2 h-5 w-5" />
               {isOutOfStock ? "Out of stock" : "Add to cart"}

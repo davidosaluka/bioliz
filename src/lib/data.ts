@@ -103,7 +103,11 @@ export async function getProducts(
   }
 
   if (filters.inStock) {
-    query = query.or("track_stock.eq.false,stock_quantity.gt.0");
+    // Products are in stock if stock tracking is disabled, the parent product
+    // has stock, or at least one active variant has stock.
+    query = query.or(
+      "track_stock.eq.false,stock_quantity.gt.0,variants.stock_quantity.gt.0"
+    );
   }
 
   if (

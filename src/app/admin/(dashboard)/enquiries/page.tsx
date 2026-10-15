@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { getEnquiriesAdmin, updateEnquiryStatus } from "@/actions/enquiries";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -20,6 +18,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { toast } from "sonner";
+
+const ENQUIRY_STATUSES = ["new", "in_progress", "resolved"] as const;
+
+const ENQUIRY_STATUS_LABELS: Record<(typeof ENQUIRY_STATUSES)[number], string> = {
+  new: "New",
+  in_progress: "In Progress",
+  resolved: "Resolved",
+};
 
 export default function AdminEnquiriesPage() {
   const [enquiries, setEnquiries] = useState<Awaited<ReturnType<typeof getEnquiriesAdmin>>>([]);
@@ -101,12 +107,16 @@ export default function AdminEnquiriesPage() {
                       }
                     >
                       <SelectTrigger className="w-32">
-                        <SelectValue />
+                        <SelectValue>
+                          {ENQUIRY_STATUS_LABELS[enquiry.status as keyof typeof ENQUIRY_STATUS_LABELS]}
+                        </SelectValue>
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="new">New</SelectItem>
-                        <SelectItem value="handled">Handled</SelectItem>
-                        <SelectItem value="archived">Archived</SelectItem>
+                        {ENQUIRY_STATUSES.map((status) => (
+                          <SelectItem key={status} value={status}>
+                            {ENQUIRY_STATUS_LABELS[status]}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </TableCell>

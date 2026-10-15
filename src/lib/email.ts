@@ -10,6 +10,15 @@ const from = process.env.EMAIL_FROM ?? "Bioliz Global Sport <noreply@biolizgloba
 const vendorEmail = process.env.VENDOR_NOTIFY_EMAIL;
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
+function escapeHtml(unsafe: string): string {
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 type EmailOrderItem = {
   product_name: string;
   variant_label: string | null;
@@ -40,7 +49,7 @@ function orderUrl(order: EmailOrder) {
 function itemList(items: EmailOrderItem[]) {
   return items
     .map((item) => {
-      const name = [item.product_name, item.variant_label]
+      const name = [escapeHtml(item.product_name), item.variant_label ? escapeHtml(item.variant_label) : null]
         .filter(Boolean)
         .join(" (");
       const suffix = item.variant_label ? ")" : "";
@@ -48,7 +57,7 @@ function itemList(items: EmailOrderItem[]) {
       return `<tr>
         <td style="padding:8px 0;border-bottom:1px solid #e5e5e5;">${name}${suffix}</td>
         <td style="padding:8px 0;border-bottom:1px solid #e5e5e5;text-align:center;">${item.quantity}</td>
-        <td style="padding:8px 0;border-bottom:1px solid #e5e5e5;text-align:right;">${formatCurrency(lineTotal)}</td>
+        <td style="padding:8px 0;border-bottom:1px solid #e5e5e5;text-align:right;">${escapeHtml(formatCurrency(lineTotal))}</td>
       </tr>`;
     })
     .join("");
@@ -98,9 +107,9 @@ export async function sendCustomerOrderConfirmation(order: EmailOrder) {
     : formatCurrency(order.delivery_fee ?? 0);
 
   const body = `
-    <h2 style="margin-top:0;">Thank you for your order, ${order.customer_name}!</h2>
+    <h2 style="margin-top:0;">Thank you for your order, ${escapeHtml(order.customer_name)}!</h2>
     <p>Your payment has been received and your order is being processed.</p>
-    <p><strong>Order number:</strong> ${order.order_number}</p>
+    <p><strong>Order number:</strong> ${escapeHtml(order.order_number)}</p>
     <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:16px 0;">
       <thead>
         <tr style="border-bottom:2px solid #e5e5e5;">
@@ -111,13 +120,13 @@ export async function sendCustomerOrderConfirmation(order: EmailOrder) {
       </thead>
       <tbody>${itemList(order.items)}</tbody>
     </table>
-    <p><strong>Subtotal:</strong> ${formatCurrency(order.subtotal)}</p>
-    <p><strong>Delivery:</strong> ${deliveryText}</p>
-    <p style="font-size:16px;"><strong>Total paid:</strong> ${formatCurrency(order.total ?? 0)}</p>
-    <p><strong>Delivery address:</strong><br/>${order.delivery_location}</p>
-    <p><strong>Phone:</strong> ${formatPhoneNumber(order.customer_phone)}</p>
+    <p><strong>Subtotal:</strong> ${escapeHtml(formatCurrency(order.subtotal))}</p>
+    <p><strong>Delivery:</strong> ${escapeHtml(deliveryText)}</p>
+    <p style="font-size:16px;"><strong>Total paid:</strong> ${escapeHtml(formatCurrency(order.total ?? 0))}</p>
+    <p><strong>Delivery address:</strong><br/>${escapeHtml(order.delivery_location)}</p>
+    <p><strong>Phone:</strong> ${escapeHtml(formatPhoneNumber(order.customer_phone))}</p>
     <p style="margin-top:24px;">
-      <a href="${orderUrl(order)}" style="display:inline-block;padding:12px 24px;background:#ff5a1f;color:#ffffff;text-decoration:none;border-radius:6px;">View order status</a>
+      <a href="${escapeHtml(orderUrl(order))}" style="display:inline-block;padding:12px 24px;background:#ff5a1f;color:#ffffff;text-decoration:none;border-radius:6px;">View order status</a>
     </p>
     <p style="margin-top:24px;font-size:12px;color:#6b7280;">
       Questions? Reply to this email or chat with us on WhatsApp.
@@ -147,18 +156,19 @@ export async function sendVendorOrderAlert(order: EmailOrder) {
     : `${order.delivery_zone_name ?? "Unknown zone"} (${formatCurrency(order.delivery_fee ?? 0)})`;
 
   const waNumber = order.customer_phone.replace(/\D/g, "");
-  const waLink = `https://wa.me/${waNumber}`;
+  const waLink = `https://wa.me/${escapeHtml(waNumber)}`;
+  const phoneHref = `tel:${escapeHtml(order.customer_phone)}`;
 
   const body = `
     <h2 style="margin-top:0;">New paid order</h2>
-    <p><strong>Order number:</strong> ${order.order_number}</p>
-    <p><strong>Customer:</strong> ${order.customer_name}<br/>
-    <strong>Email:</strong> ${order.customer_email ?? "—"}<br/>
-    <strong>Phone:</strong> ${formatPhoneNumber(order.customer_phone)}<br/>
+    <p><strong>Order number:</strong> ${escapeHtml(order.order_number)}</p>
+    <p><strong>Customer:</strong> ${escapeHtml(order.customer_name)}<br/>
+    <strong>Email:</strong> ${escapeHtml(order.customer_email ?? "—")}<br/>
+    <strong>Phone:</strong> ${escapeHtml(formatPhoneNumber(order.customer_phone))}<br/>
     <a href="${waLink}">Message on WhatsApp</a> | 
-    <a href="tel:${order.customer_phone}">Call customer</a></p>
-    <p><strong>Delivery:</strong> ${order.delivery_location}<br/>
-    <strong>Zone:</strong> ${deliveryText}</p>
+    <a href="${phoneHref}">Call customer</a></p>
+    <p><strong>Delivery:</strong> ${escapeHtml(order.delivery_location)}<br/>
+    <strong>Zone:</strong> ${escapeHtml(deliveryText)}</p>
     <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:16px 0;">
       <thead>
         <tr style="border-bottom:2px solid #e5e5e5;">
@@ -169,9 +179,9 @@ export async function sendVendorOrderAlert(order: EmailOrder) {
       </thead>
       <tbody>${itemList(order.items)}</tbody>
     </table>
-    <p style="font-size:16px;"><strong>Total paid:</strong> ${formatCurrency(total)}</p>
+    <p style="font-size:16px;"><strong>Total paid:</strong> ${escapeHtml(formatCurrency(total))}</p>
     <p style="margin-top:24px;">
-      <a href="${siteUrl}/admin/orders" style="display:inline-block;padding:12px 24px;background:#111827;color:#ffffff;text-decoration:none;border-radius:6px;">Open in admin</a>
+      <a href="${escapeHtml(`${siteUrl}/admin/orders`)}" style="display:inline-block;padding:12px 24px;background:#111827;color:#ffffff;text-decoration:none;border-radius:6px;">Open in admin</a>
     </p>
   `;
 

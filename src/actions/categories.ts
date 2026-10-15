@@ -79,6 +79,23 @@ export async function upsertCategory(formData: FormData) {
 export async function deleteCategory(id: string) {
   await requireAdmin();
   const admin = createAdminClient();
+
+  const { count, error: countError } = await admin
+    .from("products")
+    .select("id", { count: "exact", head: true })
+    .eq("category_id", id);
+
+  if (countError) {
+    return { success: false, error: countError.message };
+  }
+
+  if (count && count > 0) {
+    return {
+      success: false,
+      error: `Cannot delete category: ${count} product${count === 1 ? "" : "s"} still assigned to it.`,
+    };
+  }
+
   const { error } = await admin.from("categories").delete().eq("id", id);
 
   if (error) return { success: false, error: error.message };

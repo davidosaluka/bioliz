@@ -54,6 +54,14 @@ export const categorySchema = z.object({
   isActive: z.boolean().default(true),
 });
 
+function isValidProductImageUrl(url: string): boolean {
+  if (!url) return true;
+  const siteUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (!siteUrl) return true; // Validation skipped if env is unavailable during build/tests
+  const publicUrlPrefix = `${siteUrl.replace(/\/$/, "")}/storage/v1/object/public/product-images/`;
+  return url.startsWith(publicUrlPrefix) || url.startsWith("https://placehold.co/");
+}
+
 export const productSchema = z.object({
   name: z.string().min(1, "Name is required"),
   slug: z.string().min(1, "Slug is required"),
@@ -65,7 +73,13 @@ export const productSchema = z.object({
   priceOnRequest: z.boolean().default(false),
   stockQuantity: z.coerce.number().min(0).default(0),
   trackStock: z.boolean().default(true),
-  images: z.array(z.string()).default([]),
+  images: z
+    .array(z.string())
+    .default([])
+    .refine(
+      (urls) => urls.every(isValidProductImageUrl),
+      "Product images must be uploaded to the product-images storage bucket"
+    ),
   specs: z.record(z.string(), z.string()).default({}),
   isFeatured: z.boolean().default(false),
   isActive: z.boolean().default(true),

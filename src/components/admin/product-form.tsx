@@ -127,6 +127,8 @@ export function ProductForm({
     router.push("/admin/products");
   }
 
+  const selectedCategory = categories.find((c) => c.id === formData.categoryId);
+
   function addSpec() {
     if (!specKey.trim() || !specValue.trim()) return;
     setFormData({
@@ -184,7 +186,9 @@ export function ProductForm({
                 }
               >
                 <SelectTrigger id="category">
-                  <SelectValue placeholder="Select category" />
+                  <SelectValue placeholder="Select category">
+                    {selectedCategory ? selectedCategory.name : "Select category"}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map((category) => (

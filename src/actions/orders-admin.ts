@@ -12,13 +12,28 @@ const VALID_STATUS_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
   completed: ["cancelled"],
   cancelled: [],
   pending_payment: ["cancelled"],
-  paid: ["processing", "out_for_delivery", "delivered", "refunded"],
-  processing: ["out_for_delivery", "delivered", "refunded"],
-  out_for_delivery: ["delivered", "refunded"],
-  delivered: ["refunded"],
+  paid: ["processing", "out_for_delivery", "delivered"],
+  processing: ["out_for_delivery", "delivered"],
+  out_for_delivery: ["delivered"],
+  delivered: [],
   expired: [],
   refunded: [],
 };
+
+const ORDER_STATUSES: OrderStatus[] = [
+  "new",
+  "contacted",
+  "confirmed",
+  "completed",
+  "cancelled",
+  "pending_payment",
+  "paid",
+  "processing",
+  "out_for_delivery",
+  "delivered",
+  "expired",
+  "refunded",
+];
 
 export type OrderFilters = {
   status?: OrderStatus | "all";
@@ -75,6 +90,11 @@ export async function updateOrderStatus(
   adminNotes?: string
 ) {
   await requireAdmin();
+
+  if (!ORDER_STATUSES.includes(newStatus)) {
+    return { success: false, error: "Invalid order status" };
+  }
+
   const admin = createAdminClient();
 
   const { data: order, error: orderError } = await admin
@@ -140,10 +160,6 @@ export async function cancelOrRefundOrder(
     return { success: false, error: "Only paid orders can be cancelled or refunded" };
   }
 
-  if (options.returnStock && order.stock_deducted) {
-    await admin.rpc("restore_order_stock", { p_order_id: id });
-  }
-
   const { error } = await admin
     .from("orders")
     .update({
@@ -152,6 +168,25 @@ export async function cancelOrRefundOrder(
       admin_notes: options.adminNotes,
     })
     .eq("id", id);
+
+  // Restore stock only after the order has been moved to cancelled/refunded.
+  if (!error && options.returnStock && order.stock_deducted) {
+    await admin.rpc("restore_order_stock", { p_order_id: id });
+  }
+
+  if (!error) {
+    // Synchronize the corresponding payment record.
+    // cancelled: keep the payment record as success (refund is handled manually).
+    // refunded: mark the payment record as refunded.
+    const paymentStatus = newStatus === "refunded" ? "refunded" : undefined;
+    if (paymentStatus) {
+      await admin
+        .from("payments")
+        .update({ status: paymentStatus })
+        .eq("order_id", id)
+        .eq("status", "success");
+    }
+  }
 
   if (error) {
     return { success: false, error: error.message };

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useCallback, useRef } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Category } from "@/types";
 import { ProductFilters as ProductFiltersType } from "@/lib/data";
@@ -16,6 +17,25 @@ import {
 } from "@/components/ui/select";
 import { Search, X } from "lucide-react";
 
+function useDebouncedCallback(
+  callback: (value: string) => void,
+  delay: number
+) {
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  return useCallback(
+    (value: string) => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      timeoutRef.current = setTimeout(() => {
+        callback(value);
+      }, delay);
+    },
+    [callback, delay]
+  );
+}
+
 export function ProductFilters({
   categories,
   filters,
@@ -26,6 +46,10 @@ export function ProductFilters({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
+  const [search, setSearch] = useState(() => filters.search ?? "");
+  const [minPrice, setMinPrice] = useState(() => filters.minPrice?.toString() ?? "");
+  const [maxPrice, setMaxPrice] = useState(() => filters.maxPrice?.toString() ?? "");
 
   function updateParam(key: string, value: string | undefined) {
     const params = new URLSearchParams(searchParams.toString());
@@ -39,7 +63,25 @@ export function ProductFilters({
     router.push(`${pathname}?${params.toString()}`);
   }
 
+  const debouncedUpdateSearch = useDebouncedCallback(
+    (value: string) => updateParam("search", value || undefined),
+    300
+  );
+
+  const debouncedUpdateMinPrice = useDebouncedCallback(
+    (value: string) => updateParam("minPrice", value || undefined),
+    500
+  );
+
+  const debouncedUpdateMaxPrice = useDebouncedCallback(
+    (value: string) => updateParam("maxPrice", value || undefined),
+    500
+  );
+
   function clearFilters() {
+    setSearch("");
+    setMinPrice("");
+    setMaxPrice("");
     router.push(pathname);
   }
 
@@ -62,8 +104,11 @@ export function ProductFilters({
           <Input
             id="search"
             placeholder="Search products..."
-            defaultValue={filters.search}
-            onChange={(e) => updateParam("search", e.target.value)}
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              debouncedUpdateSearch(e.target.value);
+            }}
             className="pl-9"
           />
         </div>
@@ -75,9 +120,13 @@ export function ProductFilters({
           value={filters.category ?? ""}
           onValueChange={(value) => updateParam("category", value || undefined)}
         >
-
           <SelectTrigger id="category">
-            <SelectValue placeholder="All categories" />
+            <SelectValue placeholder="All categories">
+              {filters.category
+                ? categories.find((c) => c.slug === filters.category)?.name ??
+                  "All categories"
+                : "All categories"}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="">All categories</SelectItem>
@@ -96,15 +145,23 @@ export function ProductFilters({
           <Input
             type="number"
             placeholder="Min"
-            defaultValue={filters.minPrice}
-            onChange={(e) => updateParam("minPrice", e.target.value)}
+            value={minPrice}
+            onChange={(e) => {
+              setMinPrice(e.target.value);
+              debouncedUpdateMinPrice(e.target.value);
+            }}
+            aria-label="Minimum price"
           />
           <span className="text-muted-foreground">-</span>
           <Input
             type="number"
             placeholder="Max"
-            defaultValue={filters.maxPrice}
-            onChange={(e) => updateParam("maxPrice", e.target.value)}
+            value={maxPrice}
+            onChange={(e) => {
+              setMaxPrice(e.target.value);
+              debouncedUpdateMaxPrice(e.target.value);
+            }}
+            aria-label="Maximum price"
           />
         </div>
       </div>
@@ -116,7 +173,15 @@ export function ProductFilters({
           onValueChange={(value) => updateParam("sort", value ?? undefined)}
         >
           <SelectTrigger id="sort">
-            <SelectValue />
+            <SelectValue>
+              {(
+                {
+                  newest: "Newest",
+                  price_asc: "Price: Low to High",
+                  price_desc: "Price: High to Low",
+                } as const
+              )[filters.sort ?? "newest"]}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="newest">Newest</SelectItem>

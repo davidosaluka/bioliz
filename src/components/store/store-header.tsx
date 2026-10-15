@@ -70,6 +70,8 @@ export function StoreHeader() {
                 <Button
                   variant="ghost"
                   size="icon"
+                  aria-label={open ? "Close main menu" : "Open main menu"}
+                  aria-expanded={open}
                   className="flex size-10 items-center justify-center rounded-full border border-white/10 md:hidden"
                 >
                   {open ? <X size={18} /> : <Menu size={18} />}

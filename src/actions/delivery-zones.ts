@@ -26,7 +26,6 @@ export async function upsertDeliveryZone(formData: FormData) {
   const fee = Number(formData.get("fee") ?? 0);
   const sortOrder = Number(formData.get("sortOrder") ?? 0);
   const isActive = formData.get("isActive") === "true";
-  const quoteAfterPayment = formData.get("quoteAfterPayment") === "true";
 
   if (!name) {
     return { success: false, error: "Name is required" };
@@ -42,7 +41,7 @@ export async function upsertDeliveryZone(formData: FormData) {
     fee,
     sort_order: sortOrder,
     is_active: isActive,
-    quote_after_payment: quoteAfterPayment,
+    quote_after_payment: false,
   };
 
   if (id) {

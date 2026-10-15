@@ -39,9 +39,14 @@ export async function GET(request: Request) {
   let expiredCount = 0;
 
   for (const order of pendingOrders ?? []) {
-    const payment = Array.isArray(order.payment)
-      ? order.payment[0]
-      : order.payment;
+    const payments = Array.isArray(order.payment)
+      ? order.payment
+      : order.payment
+        ? [order.payment]
+        : [];
+    const payment = payments.sort(
+      (a, b) => new Date(b.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime()
+    )[0];
 
     let wasPaid = false;
 

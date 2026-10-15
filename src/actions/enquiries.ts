@@ -7,6 +7,9 @@ import { quoteSchema } from "@/lib/validators";
 
 const enquiryRateLimit = new Map<string, { count: number; resetAt: number }>();
 
+const ENQUIRY_STATUSES = ["new", "in_progress", "resolved"] as const;
+type EnquiryStatus = (typeof ENQUIRY_STATUSES)[number];
+
 async function getClientIp(): Promise<string> {
   const headersList = await headers();
   const forwarded = headersList.get("x-forwarded-for");
@@ -81,6 +84,11 @@ export async function getEnquiriesAdmin() {
 
 export async function updateEnquiryStatus(id: string, status: string) {
   await requireAdmin();
+
+  if (!ENQUIRY_STATUSES.includes(status as EnquiryStatus)) {
+    return { success: false, error: "Invalid enquiry status" };
+  }
+
   const admin = createAdminClient();
   const { error } = await admin
     .from("enquiries")

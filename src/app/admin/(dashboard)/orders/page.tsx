@@ -42,7 +42,7 @@ export default function AdminOrdersPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const status = (searchParams.get("status") as OrderStatus) || "all";
+  const status = (searchParams.get("status") as OrderStatus | "all") || "all";
   const paymentStatus = searchParams.get("paymentStatus") || "all";
   const needsAttention = searchParams.get("needsAttention") === "true";
   const includePendingExpired =
@@ -113,7 +113,9 @@ export default function AdminOrdersPage() {
               onValueChange={(value) => updateParam("status", value)}
             >
               <SelectTrigger id="statusFilter">
-                <SelectValue />
+                <SelectValue>
+                  {status === "all" ? "All statuses" : status}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {fulfilmentStatuses.map((s) => (
@@ -132,7 +134,9 @@ export default function AdminOrdersPage() {
               onValueChange={(value) => updateParam("paymentStatus", value)}
             >
               <SelectTrigger id="paymentStatusFilter">
-                <SelectValue />
+                <SelectValue>
+                  {paymentStatus === "all" ? "All payments" : paymentStatus}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {paymentStatuses.map((s) => (

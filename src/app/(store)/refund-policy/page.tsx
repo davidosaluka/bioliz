@@ -46,7 +46,11 @@ export default function RefundPolicyPage() {
           hours with photos. We will arrange a replacement or refund.
         </p>
 
-        <p className="font-semibold text-primary">[CLIENT TO REVIEW]</p>
+        <h2 className="text-xl font-semibold text-white">Contact us</h2>
+        <p>
+          If you have questions about refunds, returns or cancellations, please
+          contact us through the details on our website.
+        </p>
       </div>
     </div>
   );

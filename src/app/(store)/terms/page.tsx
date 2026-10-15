@@ -46,7 +46,11 @@ export default function TermsPage() {
           website beyond the amount paid for the relevant order.
         </p>
 
-        <p className="font-semibold text-primary">[CLIENT TO REVIEW]</p>
+        <h2 className="text-xl font-semibold text-white">Contact us</h2>
+        <p>
+          If you have questions about these terms, please contact us through the
+          details on our website.
+        </p>
       </div>
     </div>
   );

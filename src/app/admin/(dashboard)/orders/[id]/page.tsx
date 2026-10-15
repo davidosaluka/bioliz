@@ -95,7 +95,12 @@ export default function OrderDetailPage() {
     return <p className="text-muted-foreground">Order not found.</p>;
   }
 
-  const payment = Array.isArray(order.payment) ? order.payment[0] : order.payment;
+  const payment = Array.isArray(order.payment)
+    ? order.payment.sort(
+        (a, b) =>
+          new Date(b.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime()
+      )[0]
+    : order.payment;
   const isPaid = order.status === "paid";
   const isFulfilling =
     isPaid ||
@@ -309,7 +314,7 @@ export default function OrderDetailPage() {
                       }
                     >
                       <SelectTrigger>
-                        <SelectValue />
+                        <SelectValue>{order.status}</SelectValue>
                       </SelectTrigger>
                       <SelectContent>
                         {fulfilmentStatuses.map((s) => (
@@ -347,7 +352,11 @@ export default function OrderDetailPage() {
                             }
                           >
                             <SelectTrigger>
-                              <SelectValue />
+                              <SelectValue>
+                                {refundType === "refunded"
+                                  ? "Refunded"
+                                  : "Cancelled"}
+                              </SelectValue>
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="refunded">Refunded</SelectItem>

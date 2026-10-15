@@ -46,7 +46,11 @@ export default function PrivacyPage() {
           requirements.
         </p>
 
-        <p className="font-semibold text-primary">[CLIENT TO REVIEW]</p>
+        <h2 className="text-xl font-semibold text-white">Contact us</h2>
+        <p>
+          If you have questions about this privacy policy or how we handle your
+          data, please contact us through the details on our website.
+        </p>
       </div>
     </div>
   );

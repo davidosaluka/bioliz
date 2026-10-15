@@ -11,9 +11,29 @@ import { CartItem, CheckoutFormData, DeliveryZone, Order, OrderItem, Payment } f
 
 const PAYSTACK_BASE = "https://api.paystack.co";
 
-// Simple in-memory rate limiter. For production with multiple instances,
+// Simple in-memory rate limiters. For production with multiple instances,
 // replace with Redis or a database table.
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+type RateLimitEntry = { count: number; resetAt: number };
+
+function createRateLimiter(windowMs: number, limit: number) {
+  const map = new Map<string, RateLimitEntry>();
+  return {
+    isLimited(ip: string): boolean {
+      const now = Date.now();
+      const entry = map.get(ip);
+      if (!entry || now > entry.resetAt) {
+        map.set(ip, { count: 1, resetAt: now + windowMs });
+        return false;
+      }
+      entry.count++;
+      return entry.count > limit;
+    },
+  };
+}
+
+const createOrderRateLimit = createRateLimiter(10 * 60 * 1000, 5);
+const trackOrderRateLimit = createRateLimiter(10 * 60 * 1000, 10);
+const reinitializeRateLimit = createRateLimiter(10 * 60 * 1000, 5);
 
 async function getClientIp(): Promise<string> {
   const headersList = await headers();
@@ -22,26 +42,38 @@ async function getClientIp(): Promise<string> {
   return headersList.get("x-real-ip") ?? "unknown";
 }
 
-function isRateLimited(ip: string): boolean {
-  const now = Date.now();
-  const windowMs = 10 * 60 * 1000; // 10 minutes
-  const limit = 5;
-
-  const entry = rateLimitMap.get(ip);
-  if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(ip, { count: 1, resetAt: now + windowMs });
-    return false;
-  }
-
-  entry.count++;
-  return entry.count > limit;
-}
-
 function getSiteUrl(): string {
   return (
     process.env.NEXT_PUBLIC_SITE_URL ??
     "http://localhost:3000"
   ).replace(/\/$/, "");
+}
+
+function isValidEmail(value: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function isValidNigerianPhone(value: string): boolean {
+  const digits = value.replace(/\D/g, "");
+  return (
+    (digits.startsWith("0") && digits.length === 11) ||
+    (digits.startsWith("234") && digits.length === 13)
+  );
+}
+
+function validateEmailOrPhone(value: string): { isEmail: boolean; normalized?: string; error?: string } {
+  if (value.includes("@")) {
+    if (!isValidEmail(value)) {
+      return { isEmail: true, error: "Enter a valid email address" };
+    }
+    return { isEmail: true };
+  }
+
+  const normalized = normalizeNigerianPhone(value);
+  if (!normalized || !isValidNigerianPhone(normalized)) {
+    return { isEmail: false, error: "Enter a valid Nigerian phone number" };
+  }
+  return { isEmail: false, normalized };
 }
 
 type OrderItemInput = {
@@ -57,13 +89,20 @@ async function generateUniqueReference(admin: ReturnType<typeof createAdminClien
   let orderNumber = generateOrderNumber();
   let retries = 0;
   while (retries < 10) {
-    const { data: existing } = await admin
-      .from("orders")
-      .select("id")
-      .eq("order_number", orderNumber)
-      .maybeSingle();
+    const [{ data: existingOrder }, { data: existingPayment }] = await Promise.all([
+      admin
+        .from("orders")
+        .select("id")
+        .eq("order_number", orderNumber)
+        .maybeSingle(),
+      admin
+        .from("payments")
+        .select("id")
+        .eq("reference", orderNumber)
+        .maybeSingle(),
+    ]);
 
-    if (!existing) return orderNumber;
+    if (!existingOrder && !existingPayment) return orderNumber;
     orderNumber = generateOrderNumber();
     retries++;
   }
@@ -83,67 +122,43 @@ async function createFreeOrder(
 > {
   const orderNumber = await generateUniqueReference(admin);
   const phone = normalizeNigerianPhone(formData.phone);
+  const email = formData.email.toLowerCase();
   const expiresAt = new Date();
   expiresAt.setMinutes(expiresAt.getMinutes() + 30);
 
-  const { data: order, error: orderError } = await admin
-    .from("orders")
-    .insert({
-      order_number: orderNumber,
-      customer_name: formData.name,
-      customer_email: formData.email,
-      customer_phone: phone,
-      delivery_location: formData.deliveryAddress,
-      delivery_zone_id: deliveryZone.id,
-      delivery_zone_name: deliveryZone.name,
-      delivery_fee: deliveryFee,
-      delivery_quote_pending: deliveryZone.quote_after_payment,
-      notes: formData.notes ?? null,
-      subtotal,
-      total: 0,
-      payment_status: "pending",
-      status: "pending_payment",
-      expires_at: expiresAt.toISOString(),
-    })
-    .select("id, public_token")
-    .single();
+  const { data: order, error: orderError } = await admin.rpc(
+    "create_order_with_items_and_payment",
+    {
+      p_order_number: orderNumber,
+      p_customer_name: formData.name,
+      p_customer_email: email,
+      p_customer_phone: phone,
+      p_delivery_location: formData.deliveryAddress,
+      p_delivery_zone_id: deliveryZone.id,
+      p_delivery_zone_name: deliveryZone.name ?? "",
+      p_delivery_fee: deliveryFee,
+      p_delivery_quote_pending: !!deliveryZone.quote_after_payment,
+      p_notes: formData.notes ?? "",
+      p_subtotal: subtotal,
+      p_total: 0,
+      p_expires_at: expiresAt.toISOString(),
+      p_items: orderItems as never,
+      p_payment_reference: orderNumber,
+      p_payment_amount: 0,
+      p_payment_currency: "NGN",
+      p_payment_status: "success",
+    }
+  );
 
-  if (orderError || !order) {
-    console.error("createFreeOrder insert error:", orderError?.message);
+  if (orderError || !order || !order[0]) {
+    console.error("createFreeOrder RPC error:", orderError?.message);
     return { success: false, error: "Failed to create order" };
   }
 
-  const { error: itemsError } = await admin.from("order_items").insert(
-    orderItems.map((item) => ({
-      ...item,
-      order_id: order.id,
-    }))
-  );
-
-  if (itemsError) {
-    console.error("createFreeOrder items error:", itemsError.message);
-    await admin.from("orders").delete().eq("id", order.id);
-    return { success: false, error: "Failed to save order items" };
-  }
-
-  const { error: paymentError } = await admin.from("payments").insert({
-    order_id: order.id,
-    reference: orderNumber,
-    provider: "paystack",
-    amount: 0,
-    currency: "NGN",
-    status: "success",
-    paid_at: new Date().toISOString(),
-  });
-
-  if (paymentError) {
-    console.error("createFreeOrder payment error:", paymentError.message);
-    await admin.from("orders").delete().eq("id", order.id);
-    return { success: false, error: "Failed to record payment" };
-  }
+  const createdOrder = order[0];
 
   await admin.rpc("mark_order_paid", {
-    p_order_id: order.id,
+    p_order_id: createdOrder.id,
     p_reference: orderNumber,
     p_amount: 0,
     p_channel: "free_order",
@@ -151,7 +166,7 @@ async function createFreeOrder(
     p_raw: {},
   });
 
-  sendOrderEmails(order.id).catch((err) => {
+  sendOrderEmails(createdOrder.id).catch((err) => {
     console.error("createFreeOrder sendOrderEmails error:", err);
   });
 
@@ -160,7 +175,7 @@ async function createFreeOrder(
   return {
     success: true,
     orderNumber,
-    authorizationUrl: `${getSiteUrl()}/order/${orderNumber}?token=${order.public_token}`,
+    authorizationUrl: `${getSiteUrl()}/order/${orderNumber}?token=${createdOrder.public_token}`,
   };
 }
 
@@ -179,7 +194,7 @@ export async function createOrder(
 
     // Rate limiting
     const ip = await getClientIp();
-    if (isRateLimited(ip)) {
+    if (createOrderRateLimit.isLimited(ip)) {
       return {
         success: false,
         error: "Too many orders. Please try again in 10 minutes.",
@@ -196,6 +211,7 @@ export async function createOrder(
     }
 
     const phone = normalizeNigerianPhone(validated.data.phone);
+    const email = validated.data.email.toLowerCase();
 
     const cartValidation = cartSchema.safeParse(cartItems);
     if (!cartValidation.success) {
@@ -326,72 +342,49 @@ export async function createOrder(
     const expiresAt = new Date();
     expiresAt.setMinutes(expiresAt.getMinutes() + 30);
 
-    // Insert order
-    const { data: order, error: orderError } = await admin
-      .from("orders")
-      .insert({
-        order_number: orderNumber,
-        customer_name: validated.data.name,
-        customer_email: validated.data.email,
-        customer_phone: phone,
-        delivery_location: validated.data.deliveryAddress,
-        delivery_zone_id: deliveryZone.id,
-        delivery_zone_name: deliveryZone.name,
-        delivery_fee: deliveryFee,
-        delivery_quote_pending: deliveryZone.quote_after_payment,
-        notes: validated.data.notes ?? null,
-        subtotal,
-        total,
-        payment_status: "pending",
-        status: "pending_payment",
-        expires_at: expiresAt.toISOString(),
-      })
-      .select("id, public_token")
-      .single();
+    // Atomically create order, items, and initial payment record.
+    const { data: order, error: orderError } = await admin.rpc(
+      "create_order_with_items_and_payment",
+      {
+        p_order_number: orderNumber,
+        p_customer_name: validated.data.name,
+        p_customer_email: email,
+        p_customer_phone: phone,
+        p_delivery_location: validated.data.deliveryAddress,
+        p_delivery_zone_id: deliveryZone.id,
+        p_delivery_zone_name: deliveryZone.name ?? "",
+        p_delivery_fee: deliveryFee,
+        p_delivery_quote_pending: !!deliveryZone.quote_after_payment,
+        p_notes: validated.data.notes ?? "",
+        p_subtotal: subtotal,
+        p_total: total,
+        p_expires_at: expiresAt.toISOString(),
+        p_items: orderItems as never,
+        p_payment_reference: orderNumber,
+        p_payment_amount: total,
+        p_payment_currency: "NGN",
+      }
+    );
 
-    if (orderError || !order) {
-      console.error("createOrder insert error:", orderError?.message);
+    if (orderError || !order || !order[0]) {
+      console.error("createOrder RPC error:", orderError?.message);
       return { success: false, error: "Failed to create order" };
     }
 
-    // Insert order items
-    const { error: itemsError } = await admin.from("order_items").insert(
-      orderItems.map((item) => ({
-        ...item,
-        order_id: order.id,
-      }))
-    );
-
-    if (itemsError) {
-      console.error("createOrder items error:", itemsError.message);
-      await admin.from("orders").delete().eq("id", order.id);
-      return { success: false, error: "Failed to save order items" };
-    }
-
-    // Insert payment record
-    const { error: paymentError } = await admin.from("payments").insert({
-      order_id: order.id,
-      reference: orderNumber,
-      provider: "paystack",
-      amount: total,
-      currency: "NGN",
-      status: "pending",
-    });
-
-    if (paymentError) {
-      console.error("createOrder payment error:", paymentError.message);
-      await admin.from("orders").delete().eq("id", order.id);
-      return { success: false, error: "Failed to initialize payment" };
-    }
+    const createdOrder = order[0];
 
     // Initialize Paystack transaction
     const secretKey = process.env.PAYSTACK_SECRET_KEY;
     if (!secretKey) {
-      await admin.from("orders").delete().eq("id", order.id);
+      await admin
+        .from("orders")
+        .update({ status: "expired", payment_status: "failed", expires_at: new Date().toISOString() })
+        .eq("id", createdOrder.id);
+      await admin.from("payments").update({ status: "failed" }).eq("reference", orderNumber);
       return { success: false, error: "Payment gateway is not configured" };
     }
 
-    const callbackUrl = `${getSiteUrl()}/order/${orderNumber}?token=${order.public_token}`;
+    const callbackUrl = `${getSiteUrl()}/order/${orderNumber}?token=${createdOrder.public_token}`;
 
     const paystackRes = await fetch(`${PAYSTACK_BASE}/transaction/initialize`, {
       method: "POST",
@@ -400,13 +393,13 @@ export async function createOrder(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        email: validated.data.email,
+        email,
         amount: amountKobo,
         currency: "NGN",
         reference: orderNumber,
         callback_url: callbackUrl,
         metadata: {
-          order_id: order.id,
+          order_id: createdOrder.id,
           order_number: orderNumber,
           customer_name: validated.data.name,
           phone,
@@ -418,10 +411,16 @@ export async function createOrder(
 
     if (!paystackRes.ok || !paystackData.status || !paystackData.data?.authorization_url) {
       console.error("Paystack initialize failed:", paystackData);
-      await admin
-        .from("orders")
-        .update({ status: "expired", payment_status: "failed" })
-        .eq("id", order.id);
+      await Promise.all([
+        admin
+          .from("orders")
+          .update({ status: "expired", payment_status: "failed", expires_at: new Date().toISOString() })
+          .eq("id", createdOrder.id),
+        admin
+          .from("payments")
+          .update({ status: "failed" })
+          .eq("reference", orderNumber),
+      ]);
       return {
         success: false,
         error: "Could not start payment. Please try again.",
@@ -481,11 +480,17 @@ export async function refreshOrderStatus(
     return { success: false, error: "Order not found" };
   }
 
-  const payment = order.payment?.[0];
+  // With payment retries, there may be multiple payment rows. Verify the latest one.
+  const payment = order.payment?.length
+    ? order.payment.sort(
+        (a, b) =>
+          new Date(b.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime()
+      )[0]
+    : undefined;
   const canVerify =
     order.status === "pending_payment" ||
     (order.status === "expired" && order.payment_status !== "paid");
-  if (canVerify && payment?.reference) {
+  if (canVerify && payment?.reference && payment.status !== "success") {
     try {
       const verified = await verifyPaystackPayment(payment.reference);
       const total = order.total ?? 0;
@@ -525,6 +530,11 @@ export async function reinitializePayment(
   | { success: true; authorizationUrl: string }
   | { success: false; error: string }
 > {
+  const ip = await getClientIp();
+  if (reinitializeRateLimit.isLimited(ip)) {
+    return { success: false, error: "Too many attempts. Please try again in 10 minutes." };
+  }
+
   const admin = createAdminClient();
   const { data: order, error } = await admin
     .from("orders")
@@ -616,10 +626,17 @@ export async function reinitializePayment(
     .update({ expires_at: newExpiresAt.toISOString() })
     .eq("id", order.id);
 
-  const payment = order.payment?.[0];
-  // Reuse existing authorization URL if available.
-  if (payment?.authorization_url) {
-    return { success: true, authorizationUrl: payment.authorization_url };
+  // With retries there may be multiple payment rows. Work with the latest one.
+  const latestPayment = order.payment?.length
+    ? order.payment.sort(
+        (a, b) =>
+          new Date(b.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime()
+      )[0]
+    : undefined;
+
+  // Reuse the latest authorization URL if available so we don't orphan references.
+  if (latestPayment?.authorization_url) {
+    return { success: true, authorizationUrl: latestPayment.authorization_url };
   }
 
   const secretKey = process.env.PAYSTACK_SECRET_KEY;
@@ -670,30 +687,32 @@ export async function reinitializePayment(
 
   const authorizationUrl = paystackData.data.authorization_url as string;
 
-  // Update the existing payment record with the new reference and URL.
-  if (payment?.id) {
-    await admin
-      .from("payments")
-      .update({ reference: newReference, authorization_url: authorizationUrl })
-      .eq("id", payment.id);
-  } else {
-    await admin
-      .from("payments")
-      .insert({
-        order_id: order.id,
-        reference: newReference,
-        provider: "paystack",
-        amount: total,
-        currency: "NGN",
-        status: "pending",
-        authorization_url: authorizationUrl,
-      });
+  // Insert a new payment row so the old reference remains traceable.
+  const { error: insertError } = await admin.from("payments").insert({
+    order_id: order.id,
+    reference: newReference,
+    provider: "paystack",
+    amount: total,
+    currency: "NGN",
+    status: "pending",
+    authorization_url: authorizationUrl,
+    parent_payment_id: latestPayment?.id ?? null,
+  });
+
+  if (insertError) {
+    console.error("reinitializePayment insert error:", insertError.message);
+    return { success: false, error: "Could not restart payment. Please try again." };
   }
 
   return { success: true, authorizationUrl };
 }
 
 export async function trackOrder(formData: FormData) {
+  const ip = await getClientIp();
+  if (trackOrderRateLimit.isLimited(ip)) {
+    return { success: false, error: "Too many attempts. Please try again later." };
+  }
+
   const orderNumber = String(formData.get("orderNumber") ?? "").trim();
   const emailOrPhone = String(formData.get("emailOrPhone") ?? "").trim();
 
@@ -701,10 +720,10 @@ export async function trackOrder(formData: FormData) {
     return { success: false, error: "Enter your order number and email or phone" };
   }
 
-  const isEmail = emailOrPhone.includes("@");
-  const normalizedPhone = isEmail
-    ? undefined
-    : normalizeNigerianPhone(emailOrPhone);
+  const validation = validateEmailOrPhone(emailOrPhone);
+  if (validation.error) {
+    return { success: false, error: validation.error };
+  }
 
   const admin = createAdminClient();
   let query = admin
@@ -712,10 +731,10 @@ export async function trackOrder(formData: FormData) {
     .select("order_number, public_token, customer_email, customer_phone")
     .eq("order_number", orderNumber);
 
-  if (isEmail) {
-    query = query.eq("customer_email", emailOrPhone);
+  if (validation.isEmail) {
+    query = query.eq("customer_email", emailOrPhone.toLowerCase());
   } else {
-    query = query.eq("customer_phone", normalizedPhone ?? emailOrPhone);
+    query = query.eq("customer_phone", validation.normalized!);
   }
 
   const { data: order, error } = await query.maybeSingle();

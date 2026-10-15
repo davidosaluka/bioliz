@@ -34,7 +34,6 @@ export default function DeliveryZonesPage() {
     fee: "",
     sortOrder: "0",
     isActive: true,
-    quoteAfterPayment: false,
   });
 
   useEffect(() => {
@@ -56,7 +55,6 @@ export default function DeliveryZonesPage() {
       fee: String(zone.fee ?? 0),
       sortOrder: String(zone.sort_order ?? 0),
       isActive: zone.is_active ?? true,
-      quoteAfterPayment: zone.quote_after_payment ?? false,
     });
   }
 
@@ -68,7 +66,6 @@ export default function DeliveryZonesPage() {
       fee: "",
       sortOrder: "0",
       isActive: true,
-      quoteAfterPayment: false,
     });
   }
 
@@ -81,7 +78,6 @@ export default function DeliveryZonesPage() {
     payload.set("fee", formData.fee);
     payload.set("sortOrder", formData.sortOrder);
     payload.set("isActive", String(formData.isActive));
-    payload.set("quoteAfterPayment", String(formData.quoteAfterPayment));
 
     const result = await upsertDeliveryZone(payload);
     if (!result.success) {
@@ -138,7 +134,6 @@ export default function DeliveryZonesPage() {
                 step="0.01"
                 value={formData.fee}
                 onChange={(e) => setFormData({ ...formData, fee: e.target.value })}
-                disabled={formData.quoteAfterPayment}
               />
             </div>
             <div className="space-y-2 sm:col-span-2">
@@ -172,16 +167,6 @@ export default function DeliveryZonesPage() {
                   }
                 />
                 <Label htmlFor="isActive">Active</Label>
-              </div>
-              <div className="flex items-center gap-2">
-                <Switch
-                  id="quoteAfterPayment"
-                  checked={formData.quoteAfterPayment}
-                  onCheckedChange={(checked) =>
-                    setFormData({ ...formData, quoteAfterPayment: checked })
-                  }
-                />
-                <Label htmlFor="quoteAfterPayment">Quote after payment</Label>
               </div>
             </div>
             <div className="flex gap-2 sm:col-span-2">
@@ -224,11 +209,7 @@ export default function DeliveryZonesPage() {
                   <TableCell className="text-muted-foreground">
                     {zone.description}
                   </TableCell>
-                  <TableCell>
-                    {zone.quote_after_payment
-                      ? "Quoted after payment"
-                      : formatCurrency(zone.fee ?? 0)}
-                  </TableCell>
+                  <TableCell>{formatCurrency(zone.fee ?? 0)}</TableCell>
                   <TableCell>{zone.sort_order}</TableCell>
                   <TableCell>{zone.is_active ? "Yes" : "No"}</TableCell>
                   <TableCell className="text-right">

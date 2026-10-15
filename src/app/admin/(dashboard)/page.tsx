@@ -1,16 +1,17 @@
 import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { requireAdmin } from "@/lib/admin-auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Package,
   AlertTriangle,
   ClipboardList,
-  CreditCard,
   TrendingUp,
   Bell,
 } from "lucide-react";
 
 async function getDashboardStats() {
+  await requireAdmin();
   const admin = createAdminClient();
 
   const now = new Date();

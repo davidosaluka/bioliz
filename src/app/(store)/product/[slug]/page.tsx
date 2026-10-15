@@ -4,7 +4,6 @@ import { Metadata } from "next";
 import { getProductBySlug, getRelatedProducts, getSiteSettings } from "@/lib/data";
 import { createMetadata } from "@/lib/metadata";
 import { formatCurrency } from "@/lib/format";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ProductGrid } from "@/components/store/product-grid";
 import { ProductActions } from "@/components/store/product-actions";
@@ -49,12 +48,14 @@ export default async function ProductPage({
 
   const related = await getRelatedProducts(product);
   const coverImage = product.images?.[0] ?? "/placeholder.svg";
-  const isOutOfStock =
-    product.track_stock && (product.stock_quantity ?? 0) <= 0;
-  const isLowStock =
-    product.track_stock &&
-    (product.stock_quantity ?? 0) > 0 &&
-    (product.stock_quantity ?? 0) <= 3;
+
+  const activeVariants =
+    product.variants?.filter((v) => v.is_active ?? false) ?? [];
+  const hasVariants = activeVariants.length > 0;
+  const isOutOfStock = hasVariants
+    ? product.track_stock &&
+      !activeVariants.some((v) => (v.stock_quantity ?? 0) > 0)
+    : product.track_stock && (product.stock_quantity ?? 0) <= 0;
 
   const productUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/product/${product.slug}`;
 
@@ -154,8 +155,6 @@ export default async function ProductPage({
                   )}
                 </>
               )}
-              {isOutOfStock && <Badge variant="secondary">Out of stock</Badge>}
-              {isLowStock && <Badge variant="secondary">Low stock</Badge>}
             </div>
 
             {product.short_description && (

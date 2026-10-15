@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { getCategoriesAdmin, upsertCategory, deleteCategory } from "@/actions/categories";
 import { Category } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -20,7 +19,6 @@ import { toast } from "sonner";
 import { Pencil, Trash2 } from "lucide-react";
 
 export default function AdminCategoriesPage() {
-  const router = useRouter();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<Category | null>(null);
