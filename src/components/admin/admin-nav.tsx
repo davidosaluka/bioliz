@@ -54,3 +54,5 @@ export function AdminNav() {
     </nav>
   );
 }
+
+//some dummy text
