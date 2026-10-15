@@ -46,8 +46,13 @@ export default async function OrderPage({
   }
 
   // If still pending, verify with Paystack in case the customer returned before
-  // the webhook arrived.
-  const payment = order.payment?.[0];
+  // the webhook arrived. Always use the latest payment row in case of retries.
+  const payment = order.payment?.length
+    ? order.payment.sort(
+        (a, b) =>
+          new Date(b.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime()
+      )[0]
+    : undefined;
   const canVerify =
     order.status === "pending_payment" ||
     (order.status === "expired" && order.payment_status !== "paid");

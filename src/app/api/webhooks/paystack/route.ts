@@ -1,5 +1,4 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { verifyPaystackPayment } from "@/lib/paystack";
 import { sendOrderEmails } from "@/lib/email";
 import crypto from "crypto";
 
@@ -98,6 +97,9 @@ export async function POST(request: Request) {
     const expectedKobo = Math.round((order.total ?? 0) * 100);
 
     if (amountKobo !== expectedKobo || currency !== "NGN") {
+      console.error(
+        `Webhook amount/currency mismatch for ${reference}: ${amountKobo} ${currency} vs ${expectedKobo} NGN`
+      );
       await admin
         .from("orders")
         .update({
@@ -108,29 +110,28 @@ export async function POST(request: Request) {
       return new Response("OK", { status: 200 });
     }
 
-    // Optionally confirm with Verify API for extra safety.
-    let verified = data;
-    try {
-      const verifyResult = await verifyPaystackPayment(reference);
-      if (verifyResult.status && verifyResult.data) {
-        verified = verifyResult.data;
-      }
-    } catch (err) {
-      console.error("Webhook verify fallback error:", err);
-    }
-
-    if (verified.status !== "success") {
+    if (data.status !== "success") {
+      console.error(`Webhook charge.success status not success for ${reference}:`, data.status);
       return new Response("OK", { status: 200 });
     }
 
-    await admin.rpc("mark_order_paid", {
+    // The webhook payload is already HMAC-verified by Paystack, so we trust it
+    // and mark the order paid without calling the Verify API. This avoids
+    // Netlify function timeouts when the Verify API is slow or unreachable.
+    console.log(`Webhook marking order ${order.id} as paid for reference ${reference}`);
+    const { error: markPaidError } = await admin.rpc("mark_order_paid", {
       p_order_id: order.id,
       p_reference: reference,
       p_amount: order.total ?? 0,
-      p_channel: String(verified.channel ?? ""),
-      p_txn_id: String(verified.id ?? ""),
-      p_raw: verified as never,
+      p_channel: String(data.channel ?? ""),
+      p_txn_id: String(data.id ?? ""),
+      p_raw: data as never,
     });
+
+    if (markPaidError) {
+      console.error("Webhook mark_order_paid error:", markPaidError);
+      return new Response("Internal server error", { status: 500 });
+    }
 
     // Send emails outside the critical response path.
     sendOrderEmails(order.id).catch((err) => {

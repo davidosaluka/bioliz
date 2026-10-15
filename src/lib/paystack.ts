@@ -27,7 +27,9 @@ export async function verifyPaystackPayment(
   }
 
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 10_000);
+  // Keep well under Netlify's default 10s function timeout so the function
+  // has time to fall back or respond even if Paystack is slow.
+  const timeoutId = setTimeout(() => controller.abort(), 5_000);
 
   try {
     const res = await fetch(`${PAYSTACK_BASE}/transaction/verify/${reference}`, {

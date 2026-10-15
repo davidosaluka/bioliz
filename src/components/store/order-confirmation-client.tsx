@@ -66,8 +66,14 @@ export function OrderConfirmationClient({ order }: { order: OrderView }) {
   const [currentOrder, setCurrentOrder] = useState<OrderView>(order);
   const [retrying, setRetrying] = useState(false);
   const [polling, setPolling] = useState(false);
+  const [verifying, setVerifying] = useState(false);
 
-  const payment = currentOrder.payment?.[0];
+  const payment = currentOrder.payment?.length
+    ? currentOrder.payment.sort(
+        (a, b) =>
+          new Date(b.paid_at ?? 0).getTime() - new Date(a.paid_at ?? 0).getTime()
+      )[0]
+    : undefined;
 
   // Clear cart once the order is paid.
   useEffect(() => {
@@ -120,6 +126,24 @@ export function OrderConfirmationClient({ order }: { order: OrderView }) {
     }
 
     window.location.href = result.authorizationUrl;
+  }
+
+  async function handleVerify() {
+    setVerifying(true);
+    const result = await refreshOrderStatus(currentOrder.order_number, token);
+    setVerifying(false);
+
+    if (!result.success) {
+      toast.error(result.error ?? "Could not verify payment");
+      return;
+    }
+
+    setCurrentOrder(result.order as unknown as OrderView);
+    if (result.order.status === "paid") {
+      toast.success("Payment confirmed");
+    } else {
+      toast.info("Payment not confirmed yet. Please wait or try again.");
+    }
   }
 
   function handlePrint() {
@@ -322,10 +346,20 @@ export function OrderConfirmationClient({ order }: { order: OrderView }) {
               <>
                 <Button
                   className="flex-1 bg-primary text-primary-foreground hover:bg-brand-dark"
+                  onClick={handleVerify}
+                  disabled={verifying || polling}
+                >
+                  <RefreshCw
+                    className={`mr-2 h-4 w-4 ${verifying || polling ? "animate-spin" : ""}`}
+                  />
+                  {verifying || polling ? "Checking..." : "Confirm payment"}
+                </Button>
+                <Button
+                  variant="outline"
+                  className="flex-1 border-white/20 hover:bg-white/5"
                   onClick={handleRetry}
                   disabled={retrying}
                 >
-                  <RefreshCw className="mr-2 h-4 w-4" />
                   {retrying ? "Starting..." : "Try payment again"}
                 </Button>
                 <Link href="/shop" className="flex-1">
