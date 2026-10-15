@@ -6,6 +6,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { checkoutSchema, cartSchema } from "@/lib/validators";
 import { generateOrderNumber, normalizeNigerianPhone } from "@/lib/format";
 import { verifyPaystackPayment } from "@/lib/paystack";
+import { markPaidFromWebhookEvent } from "@/lib/webhook-payment";
 import { sendOrderEmails } from "@/lib/email";
 import { CartItem, CheckoutFormData, DeliveryZone, Order, OrderItem, Payment } from "@/types";
 
@@ -491,26 +492,37 @@ export async function refreshOrderStatus(
     order.status === "pending_payment" ||
     (order.status === "expired" && order.payment_status !== "paid");
   if (canVerify && payment?.reference && payment.status !== "success") {
-    try {
-      const verified = await verifyPaystackPayment(payment.reference);
-      const total = order.total ?? 0;
-      if (
-        verified.status &&
-        verified.data?.status === "success" &&
-        verified.data.currency === "NGN" &&
-        verified.data.amount === Math.round(total * 100)
-      ) {
-        await admin.rpc("mark_order_paid", {
-          p_order_id: order.id,
-          p_reference: payment.reference,
-          p_amount: total,
-          p_channel: verified.data.channel ?? null,
-          p_txn_id: String(verified.data.id),
-          p_raw: verified.data as never,
-        });
+    const total = order.total ?? 0;
+
+    // First, check if a Paystack webhook event already confirmed this payment.
+    // This avoids hitting the Verify API when Netlify has trouble reaching Paystack.
+    const markedFromWebhook = await markPaidFromWebhookEvent(
+      payment.reference,
+      order.id,
+      total
+    );
+
+    if (!markedFromWebhook) {
+      try {
+        const verified = await verifyPaystackPayment(payment.reference);
+        if (
+          verified.status &&
+          verified.data?.status === "success" &&
+          verified.data.currency === "NGN" &&
+          verified.data.amount === Math.round(total * 100)
+        ) {
+          await admin.rpc("mark_order_paid", {
+            p_order_id: order.id,
+            p_reference: payment.reference,
+            p_amount: total,
+            p_channel: verified.data.channel ?? null,
+            p_txn_id: String(verified.data.id),
+            p_raw: verified.data as never,
+          });
+        }
+      } catch (err) {
+        console.error("refreshOrderStatus verify error:", err);
       }
-    } catch (err) {
-      console.error("refreshOrderStatus verify error:", err);
     }
   }
 

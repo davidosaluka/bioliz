@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { verifyPaystackPayment } from "@/lib/paystack";
+import { markPaidFromWebhookEvent } from "@/lib/webhook-payment";
 import { sendOrderEmails } from "@/lib/email";
 import { createMetadata } from "@/lib/metadata";
 import { OrderConfirmationClient } from "@/components/store/order-confirmation-client";
@@ -57,30 +58,45 @@ export default async function OrderPage({
     order.status === "pending_payment" ||
     (order.status === "expired" && order.payment_status !== "paid");
   if (canVerify && payment?.reference) {
-    try {
-      const verified = await verifyPaystackPayment(payment.reference);
-      const total = order.total ?? 0;
-      if (
-        verified.status &&
-        verified.data?.status === "success" &&
-        verified.data.currency === "NGN" &&
-        verified.data.amount === Math.round(total * 100)
-      ) {
-        await admin.rpc("mark_order_paid", {
-          p_order_id: order.id,
-          p_reference: payment.reference,
-          p_amount: total,
-          p_channel: verified.data.channel ?? null,
-          p_txn_id: String(verified.data.id),
-          p_raw: verified.data as never,
-        });
+    const total = order.total ?? 0;
 
-        sendOrderEmails(order.id).catch((err) => {
-          console.error("OrderPage sendOrderEmails error:", err);
-        });
+    // First try to mark paid from an already-received Paystack webhook event.
+    // This is more reliable when the Verify API is unreachable from Netlify.
+    const markedFromWebhook = await markPaidFromWebhookEvent(
+      payment.reference,
+      order.id,
+      total
+    );
+
+    if (!markedFromWebhook) {
+      try {
+        const verified = await verifyPaystackPayment(payment.reference);
+        if (
+          verified.status &&
+          verified.data?.status === "success" &&
+          verified.data.currency === "NGN" &&
+          verified.data.amount === Math.round(total * 100)
+        ) {
+          await admin.rpc("mark_order_paid", {
+            p_order_id: order.id,
+            p_reference: payment.reference,
+            p_amount: total,
+            p_channel: verified.data.channel ?? null,
+            p_txn_id: String(verified.data.id),
+            p_raw: verified.data as never,
+          });
+
+          sendOrderEmails(order.id).catch((err) => {
+            console.error("OrderPage sendOrderEmails error:", err);
+          });
+        }
+      } catch (err) {
+        console.error("OrderPage verify error:", err);
       }
-    } catch (err) {
-      console.error("OrderPage verify error:", err);
+    } else {
+      sendOrderEmails(order.id).catch((err) => {
+        console.error("OrderPage sendOrderEmails error:", err);
+      });
     }
   }
 
