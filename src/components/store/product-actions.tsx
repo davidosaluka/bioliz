@@ -83,8 +83,8 @@ export function ProductActions({
   }
 
   function handleAskOnWhatsApp() {
-    const number = whatsappNumber ?? "2348143309703";
-    const url = buildProductWhatsAppMessage(number, product.name, productUrl);
+    if (!whatsappNumber) return;
+    const url = buildProductWhatsAppMessage(whatsappNumber, product.name, productUrl);
     window.open(url, "_blank");
   }
 
@@ -173,15 +173,17 @@ export function ProductActions({
               <MessageCircle className="mr-2 h-5 w-5" />
               Request a Quote
             </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="flex-1 border-white/20 hover:bg-white/5"
-              onClick={handleAskOnWhatsApp}
-            >
-              <MessageCircle className="mr-2 h-5 w-5" />
-              Ask on WhatsApp
-            </Button>
+            {whatsappNumber && (
+              <Button
+                size="lg"
+                variant="outline"
+                className="flex-1 border-white/20 hover:bg-white/5"
+                onClick={handleAskOnWhatsApp}
+              >
+                <MessageCircle className="mr-2 h-5 w-5" />
+                Ask on WhatsApp
+              </Button>
+            )}
           </>
         ) : (
           <>
@@ -194,15 +196,17 @@ export function ProductActions({
               <ShoppingCart className="mr-2 h-5 w-5" />
               {isOutOfStock ? "Out of stock" : "Add to cart"}
             </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="flex-1 border-white/20 hover:bg-white/5"
-              onClick={handleAskOnWhatsApp}
-            >
-              <MessageCircle className="mr-2 h-5 w-5" />
-              Ask on WhatsApp
-            </Button>
+            {whatsappNumber && (
+              <Button
+                size="lg"
+                variant="outline"
+                className="flex-1 border-white/20 hover:bg-white/5"
+                onClick={handleAskOnWhatsApp}
+              >
+                <MessageCircle className="mr-2 h-5 w-5" />
+                Ask on WhatsApp
+              </Button>
+            )}
           </>
         )}
       </div>

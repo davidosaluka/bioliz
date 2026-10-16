@@ -31,9 +31,12 @@ function getStockBadge(product: ProductWithCategory) {
 
 export function FeaturedProductsGrid({
   products,
+  storeName,
 }: {
   products: ProductWithCategory[];
+  storeName?: string;
 }) {
+  const brandTag = storeName ? storeName.split(" ")[0] : "Bioliz";
   return (
     <section id="shop" className="border-y border-white/10 bg-card/35">
       <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8 lg:py-28">
@@ -113,7 +116,7 @@ export function FeaturedProductsGrid({
                     </div>
                     <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
                       <span className="text-[9px] font-bold uppercase tracking-[0.18em] text-white/60">
-                        Bioliz / 2026
+                        {brandTag} / {new Date().getFullYear()}
                       </span>
                       <Sparkles size={15} className="text-primary" />
                     </div>

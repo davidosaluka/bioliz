@@ -15,9 +15,13 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const product = await getProductBySlug(slug);
+  const [product, settings] = await Promise.all([
+    getProductBySlug(slug),
+    getSiteSettings(),
+  ]);
   if (!product) return { title: "Product" };
 
+  const storeName = settings?.store_name ?? "Bioliz Global Sport";
   const priceText = product.price_on_request
     ? "Price on request"
     : `₦${Number(product.price).toLocaleString()}`;
@@ -27,9 +31,10 @@ export async function generateMetadata({
     description:
       product.short_description ??
       product.description ??
-      `Shop ${product.name} at Bioliz Global Sport. ${priceText}. Delivery across Nigeria.`,
+      `Shop ${product.name} at ${storeName}. ${priceText}. Delivery across Nigeria.`,
     path: `/product/${product.slug}`,
     ogImage: product.images?.[0] ?? "/opengraph-image",
+    settings,
   });
 }
 

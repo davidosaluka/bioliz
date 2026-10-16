@@ -1,25 +1,13 @@
 "use client";
 
 import { MessageCircle } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
-import { useEffect, useState } from "react";
 
-export function FloatingWhatsApp() {
-  const [whatsappNumber, setWhatsappNumber] = useState("2348143309703");
-
-  useEffect(() => {
-    const supabase = createClient();
-    supabase
-      .from("site_settings")
-      .select("whatsapp_number")
-      .eq("id", 1)
-      .single()
-      .then(({ data }) => {
-        if (data?.whatsapp_number) {
-          setWhatsappNumber(data.whatsapp_number);
-        }
-      });
-  }, []);
+export function FloatingWhatsApp({
+  whatsappNumber,
+}: {
+  whatsappNumber?: string | null;
+}) {
+  if (!whatsappNumber) return null;
 
   const message = encodeURIComponent(
     "Hello! I have a question about your products."

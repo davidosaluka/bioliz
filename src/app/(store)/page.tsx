@@ -1,21 +1,23 @@
-import { getCategories, getFeaturedProducts } from "@/lib/data";
+import { getCategories, getFeaturedProducts, getSiteSettings } from "@/lib/data";
 import { HeroSection } from "@/components/store/hero-section";
 import { CategoryCards } from "@/components/store/category-cards";
 import { FeaturedProductsGrid } from "@/components/store/featured-products-grid";
 import { OurStandard } from "@/components/store/our-standard";
+import { getStoreName } from "@/lib/site";
 import { ShoppingBag, CreditCard, Truck } from "lucide-react";
 
 export default async function HomePage() {
-  const [categories, featured] = await Promise.all([
+  const [categories, featured, settings] = await Promise.all([
     getCategories(),
     getFeaturedProducts(6),
+    getSiteSettings(),
   ]);
 
   return (
     <>
       <HeroSection />
       <CategoryCards categories={categories} />
-      <FeaturedProductsGrid products={featured} />
+      <FeaturedProductsGrid products={featured} storeName={getStoreName(settings)} />
 
       <section className="border-y border-border/50 bg-card py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

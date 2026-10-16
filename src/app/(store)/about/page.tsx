@@ -1,15 +1,25 @@
 import { Metadata } from "next";
 import { createMetadata } from "@/lib/metadata";
+import { getSiteSettings } from "@/lib/data";
+import { getStoreName } from "@/lib/site";
 import { BreadcrumbJsonLd } from "@/components/store/json-ld";
 
-export const metadata: Metadata = createMetadata({
-  title: "About Bioliz Global Sport",
-  description:
-    "Bioliz Global Sport is a Nigerian supplier of gym equipment, snooker tables, table tennis tables and sports gear for homes, gyms, hotels, offices and clubs.",
-  path: "/about",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+  const storeName = getStoreName(settings);
+  return createMetadata({
+    title: `About ${storeName}`,
+    description:
+      `${storeName} is a Nigerian supplier of gym equipment, snooker tables, table tennis tables and sports gear for homes, gyms, hotels, offices and clubs.`,
+    path: "/about",
+    settings,
+  });
+}
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const settings = await getSiteSettings();
+  const storeName = getStoreName(settings);
+
   return (
     <>
       <BreadcrumbJsonLd
@@ -20,13 +30,13 @@ export default function AboutPage() {
       />
       <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
         <h1 className="text-4xl font-black uppercase tracking-[-0.05em] text-white">
-          About Bioliz Global Sport
+          About {storeName}
         </h1>
 
       <div className="mt-8 space-y-6 text-muted-foreground">
         <p>
           <strong className="text-foreground">BUILD YOUR SPACE. TRAIN HARDER. PLAY BETTER.</strong>{" "}
-          Bioliz Global Sport is a Nigerian supplier of premium gym equipment,
+          {storeName} is a Nigerian supplier of premium gym equipment,
           snooker tables, table tennis tables, sports and recreational equipment.
         </p>
 

@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
-import { getCategoryBySlug, getProducts } from "@/lib/data";
+import { getCategoryBySlug, getProducts, getSiteSettings } from "@/lib/data";
 import { createMetadata } from "@/lib/metadata";
+import { getStoreName } from "@/lib/site";
 import { ProductGrid } from "@/components/store/product-grid";
 import { BreadcrumbJsonLd } from "@/components/store/json-ld";
 
@@ -11,14 +12,19 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const category = await getCategoryBySlug(slug);
+  const [category, settings] = await Promise.all([
+    getCategoryBySlug(slug),
+    getSiteSettings(),
+  ]);
   if (!category) return { title: "Category" };
+  const storeName = getStoreName(settings);
   return createMetadata({
     title: `Buy ${category.name} in Nigeria`,
     description:
       category.description ??
-      `Shop ${category.name} at Bioliz Global Sport. Delivery available across Nigeria.`,
+      `Shop ${category.name} at ${storeName}. Delivery available across Nigeria.`,
     path: `/category/${category.slug}`,
+    settings,
   });
 }
 

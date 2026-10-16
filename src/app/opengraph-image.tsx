@@ -1,13 +1,51 @@
 import { ImageResponse } from "next/og";
+import { createClient } from "@supabase/supabase-js";
+import { Database } from "@/lib/supabase/database.types";
+import { getStoreName, DEFAULT_TAGLINE, DEFAULT_BRAND_NAME } from "@/lib/site";
 
-export const alt = "Bioliz Global Sport";
+export const alt = DEFAULT_BRAND_NAME;
 export const size = {
   width: 1200,
   height: 630,
 };
 export const contentType = "image/png";
 
-export default function OpenGraphImage() {
+async function getSettings() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !key) return null;
+
+  const supabase = createClient<Database>(url, key, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+
+  const { data } = await supabase
+    .from("site_settings")
+    .select("store_name")
+    .eq("id", 1)
+    .single();
+
+  return data;
+}
+
+export async function generateImageMetadata() {
+  const settings = await getSettings();
+  const storeName = getStoreName(settings);
+  return [
+    {
+      id: "default",
+      size,
+      alt: storeName,
+      contentType,
+    },
+  ];
+}
+
+export default async function OpenGraphImage() {
+  const settings = await getSettings();
+  const storeName = getStoreName(settings);
+  const logoText = storeName.split(" ")[0] || "Bioliz";
+
   return new ImageResponse(
     (
       <div
@@ -78,7 +116,7 @@ export default function OpenGraphImage() {
               fontFamily: "Geist, Arial, sans-serif",
             }}
           >
-            Bioliz<span style={{ color: "#ff5a1f" }}>.</span>
+            {logoText}<span style={{ color: "#ff5a1f" }}>.</span>
           </span>
         </div>
         <h1
@@ -107,7 +145,7 @@ export default function OpenGraphImage() {
             fontFamily: "Geist, Arial, sans-serif",
           }}
         >
-          Premium gym & sports equipment in Nigeria
+          {storeName} — {DEFAULT_TAGLINE}
         </p>
       </div>
     ),

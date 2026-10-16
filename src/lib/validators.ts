@@ -34,15 +34,41 @@ export const quoteSchema = z.object({
   message: z.string().min(10, "Please tell us more about your needs"),
 });
 
+const optionalUrl = z
+  .string()
+  .optional()
+  .or(z.literal(""))
+  .refine((val) => {
+    if (!val) return true;
+    try {
+      new URL(val);
+      return true;
+    } catch {
+      return false;
+    }
+  }, "Enter a valid URL");
+
 export const siteSettingsSchema = z.object({
   storeName: z.string().min(1, "Store name is required"),
   whatsappNumber: z
     .string()
     .refine(isValidNigerianPhone, "Enter a valid Nigerian WhatsApp number"),
+  phoneNumber: z
+    .string()
+    .optional()
+    .or(z.literal(""))
+    .refine((val) => !val || isValidNigerianPhone(val), "Enter a valid Nigerian phone number"),
   contactEmail: z.string().email("Invalid email").optional().or(z.literal("")),
   address: z.string().optional(),
+  businessHours: z.string().optional(),
   heroTitle: z.string().min(1, "Hero title is required"),
   heroSubtitle: z.string().optional(),
+  socialInstagram: optionalUrl,
+  socialFacebook: optionalUrl,
+  socialX: optionalUrl,
+  socialTiktok: optionalUrl,
+  socialLinkedin: optionalUrl,
+  socialYoutube: optionalUrl,
 });
 
 export const categorySchema = z.object({

@@ -1,19 +1,29 @@
 import { Metadata } from "next";
 import { createMetadata } from "@/lib/metadata";
+import { getSiteSettings } from "@/lib/data";
+import { getStoreName } from "@/lib/site";
 
-export const metadata: Metadata = createMetadata({
-  title: "Privacy Policy",
-  description: "Privacy policy for Bioliz Global Sport online store.",
-  path: "/privacy",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+  const storeName = getStoreName(settings);
+  return createMetadata({
+    title: "Privacy Policy",
+    description: `Privacy policy for ${storeName} online store.`,
+    path: "/privacy",
+    settings,
+  });
+}
 
-export default function PrivacyPage() {
+export default async function PrivacyPage() {
+  const settings = await getSiteSettings();
+  const storeName = getStoreName(settings);
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
       <h1 className="text-3xl font-bold text-white">Privacy Policy</h1>
       <div className="mt-8 space-y-6 text-muted-foreground">
         <p>
-          Bioliz Global Sport respects your privacy. This policy explains what
+          {storeName} respects your privacy. This policy explains what
           information we collect, how we use it, and how we protect it.
         </p>
 

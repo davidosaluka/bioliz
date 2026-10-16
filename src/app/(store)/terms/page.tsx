@@ -1,19 +1,29 @@
 import { Metadata } from "next";
 import { createMetadata } from "@/lib/metadata";
+import { getSiteSettings } from "@/lib/data";
+import { getStoreName } from "@/lib/site";
 
-export const metadata: Metadata = createMetadata({
-  title: "Terms of Service",
-  description: "Terms of service for Bioliz Global Sport online store.",
-  path: "/terms",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+  const storeName = getStoreName(settings);
+  return createMetadata({
+    title: "Terms of Service",
+    description: `Terms of service for ${storeName} online store.`,
+    path: "/terms",
+    settings,
+  });
+}
 
-export default function TermsPage() {
+export default async function TermsPage() {
+  const settings = await getSiteSettings();
+  const storeName = getStoreName(settings);
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
       <h1 className="text-3xl font-bold text-white">Terms of Service</h1>
       <div className="mt-8 space-y-6 text-muted-foreground">
         <p>
-          Welcome to Bioliz Global Sport. These terms govern your use of our
+          Welcome to {storeName}. These terms govern your use of our
           website and the purchase of products from our store.
         </p>
 
@@ -41,7 +51,7 @@ export default function TermsPage() {
 
         <h2 className="text-xl font-semibold text-white">Limitation of liability</h2>
         <p>
-          Bioliz Global Sport shall not be liable for any indirect, incidental
+          {storeName} shall not be liable for any indirect, incidental
           or consequential damages arising from the use of our products or
           website beyond the amount paid for the relevant order.
         </p>

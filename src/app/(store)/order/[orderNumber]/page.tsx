@@ -5,6 +5,8 @@ import { verifyPaystackPayment } from "@/lib/paystack";
 import { markPaidFromWebhookEvent } from "@/lib/webhook-payment";
 import { sendOrderEmails } from "@/lib/email";
 import { createMetadata } from "@/lib/metadata";
+import { getSiteSettings } from "@/lib/data";
+import { getStoreName } from "@/lib/site";
 import { OrderConfirmationClient } from "@/components/store/order-confirmation-client";
 
 export async function generateMetadata({
@@ -13,10 +15,13 @@ export async function generateMetadata({
   params: Promise<{ orderNumber: string }>;
 }): Promise<Metadata> {
   const { orderNumber } = await params;
+  const settings = await getSiteSettings();
+  const storeName = getStoreName(settings);
   return createMetadata({
     title: `Order ${orderNumber}`,
-    description: "View your order status and receipt from Bioliz Global Sport.",
+    description: `View your order status and receipt from ${storeName}.`,
     path: `/order/${orderNumber}`,
+    settings,
   });
 }
 

@@ -1,11 +1,18 @@
 import { Metadata } from "next";
 import { createMetadata } from "@/lib/metadata";
+import { getSiteSettings } from "@/lib/data";
+import { getStoreName } from "@/lib/site";
 
-export const metadata: Metadata = createMetadata({
-  title: "Refund, Return & Cancellation Policy",
-  description: "Refund, return and cancellation policy for Bioliz Global Sport.",
-  path: "/refund-policy",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+  const storeName = getStoreName(settings);
+  return createMetadata({
+    title: "Refund, Return & Cancellation Policy",
+    description: `Refund, return and cancellation policy for ${storeName}.`,
+    path: "/refund-policy",
+    settings,
+  });
+}
 
 export default function RefundPolicyPage() {
   return (

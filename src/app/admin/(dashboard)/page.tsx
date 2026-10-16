@@ -105,7 +105,7 @@ async function getDashboardStats() {
 
 export default async function AdminOverviewPage() {
   const stats = await getDashboardStats();
-  const isTestMode = process.env.PAYSTACK_SECRET_KEY?.startsWith("sk_test");
+
 
   const cards = [
     {
@@ -142,16 +142,6 @@ export default async function AdminOverviewPage() {
 
   return (
     <div className="space-y-8">
-      {isTestMode && (
-        <div className="rounded-lg border border-yellow-500/30 bg-yellow-500/10 p-4 text-sm text-yellow-500">
-          <p className="font-semibold">TEST MODE</p>
-          <p>
-            Paystack is using test keys. No real money is being charged. Switch
-            to live keys in production.
-          </p>
-        </div>
-      )}
-
       <div>
         <h1 className="text-3xl font-bold text-white">Dashboard</h1>
         <p className="text-muted-foreground">Overview of your store</p>

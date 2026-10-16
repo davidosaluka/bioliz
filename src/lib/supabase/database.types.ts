@@ -184,13 +184,13 @@ isOneToOne: false
                   ]
                 },"site_settings": {
                   Row: {
-                    "address": string | null,"contact_email": string | null,"hero_subtitle": string | null,"hero_title": string | null,"id": number,"store_name": string | null,"updated_at": string | null,"whatsapp_number": string | null
+                    "address": string | null,"business_hours": string | null,"contact_email": string | null,"hero_subtitle": string | null,"hero_title": string | null,"id": number,"phone_number": string | null,"social_links": Json | null,"store_name": string | null,"updated_at": string | null,"whatsapp_number": string | null
                   }
                   Insert: {
-                    "address"?: string | null,"contact_email"?: string | null,"hero_subtitle"?: string | null,"hero_title"?: string | null,"id"?: number,"store_name"?: string | null,"updated_at"?: string | null,"whatsapp_number"?: string | null
+                    "address"?: string | null,"business_hours"?: string | null,"contact_email"?: string | null,"hero_subtitle"?: string | null,"hero_title"?: string | null,"id"?: number,"phone_number"?: string | null,"social_links"?: Json | null,"store_name"?: string | null,"updated_at"?: string | null,"whatsapp_number"?: string | null
                   }
                   Update: {
-                    "address"?: string | null,"contact_email"?: string | null,"hero_subtitle"?: string | null,"hero_title"?: string | null,"id"?: number,"store_name"?: string | null,"updated_at"?: string | null,"whatsapp_number"?: string | null
+                    "address"?: string | null,"business_hours"?: string | null,"contact_email"?: string | null,"hero_subtitle"?: string | null,"hero_title"?: string | null,"id"?: number,"phone_number"?: string | null,"social_links"?: Json | null,"store_name"?: string | null,"updated_at"?: string | null,"whatsapp_number"?: string | null
                   }
                   Relationships: [
                     

@@ -1,13 +1,20 @@
 import { Metadata } from "next";
 import { createMetadata } from "@/lib/metadata";
+import { getSiteSettings } from "@/lib/data";
+import { getStoreName } from "@/lib/site";
 
-export const metadata: Metadata = createMetadata({
-  title: "Delivery Policy",
-  description: "Delivery policy for Bioliz Global Sport online store.",
-  path: "/delivery-policy",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+  const storeName = getStoreName(settings);
+  return createMetadata({
+    title: "Delivery Policy",
+    description: `Delivery policy for ${storeName} online store.`,
+    path: "/delivery-policy",
+    settings,
+  });
+}
 
-export default function DeliveryPolicyPage() {
+export default async function DeliveryPolicyPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
       <h1 className="text-3xl font-bold text-white">Delivery Policy</h1>

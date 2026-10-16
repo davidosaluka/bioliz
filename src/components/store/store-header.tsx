@@ -6,6 +6,8 @@ import { useState } from "react";
 import { useCart } from "@/lib/cart-store";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { SiteSetting } from "@/types";
+import { getStoreName } from "@/lib/site";
 
 const navLinks = [
   { href: "/shop", label: "Shop" },
@@ -14,21 +16,23 @@ const navLinks = [
   { href: "/contact", label: "Contact" },
 ];
 
-export function StoreHeader() {
+export function StoreHeader({ settings }: { settings?: SiteSetting | null }) {
   const [open, setOpen] = useState(false);
   const itemCount = useCart((state) =>
     state.items.reduce((acc, item) => acc + item.quantity, 0)
   );
+  const storeName = getStoreName(settings);
+  const logoText = storeName.split(" ")[0] || "Bioliz";
 
   return (
     <header className="relative z-20 border-b border-white/10 bg-background/90 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 lg:px-8">
-        <Link href="/" className="flex items-center gap-2.5" aria-label="Bioliz Global Sport home">
+        <Link href="/" className="flex items-center gap-2.5" aria-label={`${storeName} home`}>
           <span className="flex size-9 items-center justify-center rounded-full bg-primary text-primary-foreground">
             <Dumbbell size={18} strokeWidth={2.5} />
           </span>
           <span className="text-sm font-black uppercase tracking-[0.18em] text-foreground">
-            Bioliz<span className="text-primary">.</span>
+            {logoText}<span className="text-primary">.</span>
           </span>
         </Link>
 

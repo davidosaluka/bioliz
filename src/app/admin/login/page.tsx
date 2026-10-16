@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { login } from "@/actions/auth";
+import { DEFAULT_BRAND_NAME } from "@/lib/site";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,7 +29,7 @@ export default function AdminLoginPage() {
             Admin Login
           </CardTitle>
           <p className="text-sm text-muted-foreground">
-            Bioliz Global Sport Dashboard
+            {DEFAULT_BRAND_NAME} Dashboard
           </p>
         </CardHeader>
         <CardContent>

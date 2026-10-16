@@ -1,13 +1,23 @@
 import Link from "next/link";
 import { Phone, Mail, MapPin } from "lucide-react";
+import { SiteSetting } from "@/types";
+import { getStoreName, getActiveSocialLinks } from "@/lib/site";
+import { formatPhoneNumber } from "@/lib/format";
+import { SocialIcons } from "@/components/store/social-icons";
 
-export function StoreFooter() {
+export function StoreFooter({ settings }: { settings?: SiteSetting | null }) {
+  const storeName = getStoreName(settings);
+  const phone = settings?.phone_number;
+  const email = settings?.contact_email;
+  const address = settings?.address;
+  const socialLinks = getActiveSocialLinks(settings);
+
   return (
     <footer className="border-t border-border/50 bg-card">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <h3 className="text-lg font-bold text-white">BIOLIZ GLOBAL SPORT</h3>
+            <h3 className="text-lg font-bold text-white">{storeName}</h3>
             <p className="mt-4 text-sm text-muted-foreground">
               Build your space. Train harder. Play better. Premium gym and sports
               equipment for homes, gyms, hotels, offices and recreation centres.
@@ -79,24 +89,40 @@ export function StoreFooter() {
           <div>
             <h4 className="font-semibold text-foreground">Contact</h4>
             <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
-              <li className="flex items-center gap-2">
-                <Phone className="h-4 w-4 text-primary" />
-                <span>+234 814 330 9703</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-primary" />
-                <span>info@biolizglobalsport.com</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <MapPin className="h-4 w-4 text-primary" />
-                <span>Lagos, Nigeria</span>
-              </li>
+              {phone && (
+                <li className="flex items-center gap-2">
+                  <Phone className="h-4 w-4 text-primary" />
+                  <a href={`tel:${phone}`} className="hover:text-primary">
+                    {formatPhoneNumber(phone)}
+                  </a>
+                </li>
+              )}
+              {email && (
+                <li className="flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-primary" />
+                  <a href={`mailto:${email}`} className="hover:text-primary">
+                    {email}
+                  </a>
+                </li>
+              )}
+              {address && (
+                <li className="flex items-start gap-2">
+                  <MapPin className="h-4 w-4 text-primary" />
+                  <span>{address}</span>
+                </li>
+              )}
             </ul>
+
+            {socialLinks.length > 0 && (
+              <div className="mt-5 flex flex-wrap gap-3">
+                <SocialIcons links={socialLinks} />
+              </div>
+            )}
           </div>
         </div>
 
         <div className="mt-12 border-t border-border/50 pt-6 text-center text-sm text-muted-foreground">
-          © {new Date().getFullYear()} Bioliz Global Sport. All rights reserved.
+          © {new Date().getFullYear()} {storeName}. All rights reserved.
         </div>
       </div>
     </footer>

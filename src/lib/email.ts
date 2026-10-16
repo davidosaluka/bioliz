@@ -1,12 +1,12 @@
 import { Resend } from "resend";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formatCurrency, formatPhoneNumber } from "@/lib/format";
+import { getStoreName, DEFAULT_BRAND_NAME } from "@/lib/site";
 
 const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
   : null;
 
-const from = process.env.EMAIL_FROM ?? "Bioliz Global Sport <noreply@biolizglobalsport.com>";
 const vendorEmail = process.env.VENDOR_NOTIFY_EMAIL;
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
@@ -63,7 +63,7 @@ function itemList(items: EmailOrderItem[]) {
     .join("");
 }
 
-function baseTemplate(title: string, body: string) {
+function baseTemplate(brandName: string, title: string, body: string) {
   return `<!doctype html>
 <html>
   <head>
@@ -78,7 +78,7 @@ function baseTemplate(title: string, body: string) {
           <table width="100%" max-width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background:#ffffff;border-radius:8px;overflow:hidden;">
             <tr>
               <td style="padding:24px;background:#111827;color:#ffffff;text-align:center;">
-                <h1 style="margin:0;font-size:20px;">BIOLIZ GLOBAL SPORT</h1>
+                <h1 style="margin:0;font-size:20px;">${escapeHtml(brandName.toUpperCase())}</h1>
               </td>
             </tr>
             <tr>
@@ -88,7 +88,7 @@ function baseTemplate(title: string, body: string) {
             </tr>
             <tr>
               <td style="padding:16px 24px;background:#f9fafb;color:#6b7280;font-size:12px;text-align:center;">
-                &copy; ${new Date().getFullYear()} Bioliz Global Sport. All rights reserved.
+                &copy; ${new Date().getFullYear()} ${escapeHtml(brandName)}. All rights reserved.
               </td>
             </tr>
           </table>
@@ -99,8 +99,32 @@ function baseTemplate(title: string, body: string) {
 </html>`;
 }
 
+async function getEmailFrom(): Promise<string> {
+  const admin = createAdminClient();
+  const { data } = await admin.from("site_settings").select("store_name").eq("id", 1).single();
+  const storeName = getStoreName(data);
+  const email = process.env.EMAIL_FROM;
+  if (email) return email;
+  const domain = process.env.NEXT_PUBLIC_SITE_URL
+    ? new URL(process.env.NEXT_PUBLIC_SITE_URL).hostname
+    : "biolizglobalsport.com";
+  return `${storeName} <noreply@${domain}>`;
+}
+
+async function getBrandName(): Promise<string> {
+  try {
+    const admin = createAdminClient();
+    const { data } = await admin.from("site_settings").select("store_name").eq("id", 1).single();
+    return getStoreName(data);
+  } catch {
+    return DEFAULT_BRAND_NAME;
+  }
+}
+
 export async function sendCustomerOrderConfirmation(order: EmailOrder) {
   if (!resend || !order.customer_email) return { success: false };
+
+  const [from, brandName] = await Promise.all([getEmailFrom(), getBrandName()]);
 
   const deliveryText = order.delivery_quote_pending
     ? "Delivery cost will be quoted by our team after payment."
@@ -138,7 +162,7 @@ export async function sendCustomerOrderConfirmation(order: EmailOrder) {
       from,
       to: order.customer_email,
       subject: `Order confirmed: ${order.order_number}`,
-      html: baseTemplate("Order Confirmed", body),
+      html: baseTemplate(brandName, "Order Confirmed", body),
     });
     return { success: !result.error, error: result.error };
   } catch (err) {
@@ -149,6 +173,8 @@ export async function sendCustomerOrderConfirmation(order: EmailOrder) {
 
 export async function sendVendorOrderAlert(order: EmailOrder) {
   if (!resend || !vendorEmail) return { success: false };
+
+  const [from, brandName] = await Promise.all([getEmailFrom(), getBrandName()]);
 
   const total = order.total ?? 0;
   const deliveryText = order.delivery_quote_pending
@@ -190,7 +216,7 @@ export async function sendVendorOrderAlert(order: EmailOrder) {
       from,
       to: vendorEmail,
       subject: `New paid order: ${order.order_number}`,
-      html: baseTemplate("New Paid Order", body),
+      html: baseTemplate(brandName, "New Paid Order", body),
     });
     return { success: !result.error, error: result.error };
   } catch (err) {
